@@ -129,6 +129,7 @@ export const startChat = defineOperation({
       .min(1)
       .optional()
       .describe("REQUIRED when messaging a user who sent you a pending connection request — the invitation id from linkedin_list_invitations (direction=received)"),
+    inbox: z.string().min(1).optional().describe("Inbox id to send from (e.g. a Sales Navigator/Recruiter inbox). Omit to use the default chats/send route."),
   },
   outputShape: { chat_id: z.string(), message_ids: z.array(z.string()) },
   annotations: WRITE,
@@ -156,9 +157,14 @@ export const startChat = defineOperation({
       if (input.relation_request_id !== undefined) classic.relation_request_id = input.relation_request_id;
       if (Object.keys(classic).length > 0) body.specifics = { linkedin: { classic } };
     }
+    const inbox = input.inbox as string | undefined;
+    const path =
+      inbox !== undefined
+        ? `/v2/${accountId}/inboxes/${encodeURIComponent(inbox)}/chats/send`
+        : `/v2/${accountId}/chats/send`;
     const res = await client.request<{ chat_id: string; message_id: string | string[] | null }>({
       method: "POST",
-      path: `/v2/${accountId}/chats/send`,
+      path,
       body,
     });
     return { chat_id: res.chat_id, message_ids: toIdArray(res.message_id) };
@@ -180,6 +186,175 @@ export const markChatRead = defineOperation({
       path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}`,
       body: { read_status: true },
     });
+    return { result: res.object };
+  },
+});
+
+export const getMessage = defineOperation({
+  name: "linkedin_get_message",
+  title: "Get a single message",
+  description: "Fetch one message from a chat by chat_id and message_id.",
+  mutates: false,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id containing the message"),
+    message_id: z.string().min(1).describe("Message id from linkedin_list_messages"),
+  },
+  outputShape: itemOutputShape,
+  annotations: READ,
+  cli: { group: "messages", command: "get" },
+  run: async ({ client, accountId }, input) => ({
+    item: await client.request<Record<string, unknown>>({
+      method: "GET",
+      path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/messages/${encodeURIComponent(input.message_id as string)}`,
+    }),
+  }),
+});
+
+export const deleteMessage = defineOperation({
+  name: "linkedin_delete_message",
+  title: "Delete a message",
+  description:
+    "Delete one of YOUR OWN messages from a chat. Trying to delete another user's message fails. Depending on the provider, the message may still be visible to participants as a 'deleted' tombstone rather than fully removed.",
+  mutates: true,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id containing the message"),
+    message_id: z.string().min(1).describe("Message id to delete (must be your own)"),
+  },
+  outputShape: { deleted: z.boolean() },
+  annotations: WRITE,
+  cli: { group: "messages", command: "delete" },
+  run: async ({ client, accountId }, input) => {
+    await client.request<undefined>({
+      method: "DELETE",
+      path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/messages/${encodeURIComponent(input.message_id as string)}`,
+    });
+    return { deleted: true };
+  },
+});
+
+export const markMessageRead = defineOperation({
+  name: "linkedin_mark_message_read",
+  title: "Mark a message as read",
+  description:
+    "Mark a message sent by ANOTHER user as read by you. Trying to mark your OWN message as read fails. This does NOT change the chat's unread_count — use linkedin_mark_chat_read to update the chat-level read state.",
+  mutates: true,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id containing the message"),
+    message_id: z.string().min(1).describe("Message id to mark read (must belong to another user)"),
+  },
+  outputShape: { result: z.string() },
+  annotations: WRITE,
+  cli: { group: "messages", command: "read" },
+  run: async ({ client, accountId }, input) => {
+    const res = await client.request<{ object: string }>({
+      method: "POST",
+      path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/messages/${encodeURIComponent(input.message_id as string)}/read`,
+    });
+    return { result: res.object };
+  },
+});
+
+export const forwardMessage = defineOperation({
+  name: "linkedin_forward_message",
+  title: "Forward a message to another chat",
+  description:
+    "Forward an existing message into a different (destination) chat, with an optional extra text attached. Acts as the account owner — user-visible in the destination chat.",
+  mutates: true,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id currently containing the message"),
+    message_id: z.string().min(1).describe("Message id to forward"),
+    destination_chat_id: z.string().min(1).describe("Chat id to forward the message into"),
+    text: z.string().optional().describe("Optional text attached to the forwarded message"),
+  },
+  outputShape: { message_id: z.string(), chat_id: z.string() },
+  annotations: WRITE,
+  cli: { group: "messages", command: "forward" },
+  run: async ({ client, accountId }, input) => {
+    const body: Record<string, unknown> = { chat_id: input.destination_chat_id };
+    if (input.text !== undefined) body.text = input.text;
+    // NOTE: unlike sendMessage/startChat, forwardMessage's message_id is a plain required
+    // string in the API response, not the string | string[] | null union — do not reuse toIdArray here.
+    const res = await client.request<{ message_id: string; chat_id: string }>({
+      method: "POST",
+      path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/messages/${encodeURIComponent(input.message_id as string)}/forward`,
+      body,
+    });
+    return { message_id: res.message_id, chat_id: res.chat_id };
+  },
+});
+
+export const editMessage = defineOperation({
+  name: "linkedin_edit_message",
+  title: "Edit a message",
+  description:
+    "Edit the text of one of YOUR OWN messages. Same ownership restriction as delete — editing another user's message fails. The API does not guarantee the updated message back; the item may be null even on success.",
+  mutates: true,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id containing the message"),
+    message_id: z.string().min(1).describe("Message id to edit (must be your own)"),
+    text: z.string().min(1).describe("New plain-text message body"),
+  },
+  outputShape: { item: z.record(z.unknown()).nullable() },
+  annotations: WRITE,
+  cli: { group: "messages", command: "edit" },
+  run: async ({ client, accountId }, input) => {
+    const res = await client.request<Record<string, unknown> | null>({
+      method: "POST",
+      path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/messages/${encodeURIComponent(input.message_id as string)}/modify`,
+      body: { text: input.text },
+    });
+    return { item: res ?? null };
+  },
+});
+
+export const listParticipants = defineOperation({
+  name: "linkedin_list_participants",
+  title: "List participants in a group chat",
+  description:
+    "List the participants of a GROUP chat. Fails on 1-to-1 chats — for those, the other participant is already on the chat object itself, via linkedin_get_chat.",
+  mutates: false,
+  inputShape: { chat_id: z.string().min(1).describe("Group chat id"), ...cursorPagination },
+  outputShape: pageOutputShape,
+  annotations: READ,
+  cli: { group: "participants", command: "list" },
+  run: async ({ client, accountId }, input) =>
+    toPage(
+      await client.request<ListEnvelope>({
+        method: "GET",
+        path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/participants`,
+        query: { limit: input.limit as number | undefined, cursor: input.cursor as string | undefined },
+      })
+    ),
+});
+
+export const manageParticipants = defineOperation({
+  name: "linkedin_manage_participants",
+  title: "Add or remove a group chat participant",
+  description:
+    "Add or remove a participant in a GROUP chat. May require admin rights or provider-specific permissions. Fails on 1-to-1 chats.",
+  mutates: true,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Group chat id"),
+    action: z.enum(["add", "remove"]).describe("Add or remove the participant"),
+    user_id: z.string().min(1).describe("Provider id of the user to add or remove"),
+  },
+  outputShape: { result: z.string() },
+  annotations: WRITE,
+  cli: { group: "participants", command: "manage" },
+  run: async ({ client, accountId }, input) => {
+    const chatId = encodeURIComponent(input.chat_id as string);
+    const userId = input.user_id as string;
+    const res =
+      input.action === "add"
+        ? await client.request<{ object: string }>({
+            method: "POST",
+            path: `/v2/${accountId}/chats/${chatId}/participants`,
+            body: { user_id: userId },
+          })
+        : await client.request<{ object: string }>({
+            method: "DELETE",
+            path: `/v2/${accountId}/chats/${chatId}/participants/${encodeURIComponent(userId)}`,
+          });
     return { result: res.object };
   },
 });

@@ -1,6 +1,20 @@
 import { describe, expect, it, vi } from "vitest";
 import { UnipileClient } from "../../src/core/client.js";
-import { getChat, listChats, listMessages, markChatRead, sendMessage, startChat } from "../../src/core/operations/messaging.js";
+import {
+  deleteMessage,
+  editMessage,
+  forwardMessage,
+  getChat,
+  getMessage,
+  listChats,
+  listMessages,
+  listParticipants,
+  manageParticipants,
+  markChatRead,
+  markMessageRead,
+  sendMessage,
+  startChat,
+} from "../../src/core/operations/messaging.js";
 import { UsageError } from "../../src/core/errors.js";
 
 function ctxCapturing(responses: unknown[]) {
@@ -145,5 +159,85 @@ describe("messaging ops", () => {
     const { ctx, f } = ctxCapturing([{ }]);
     await expect(startChat.run(ctx, { user_id: "u1", text: "x", inmail: true, subject: "Intro" })).rejects.toThrow(/not both/);
     expect(f).not.toHaveBeenCalled();
+  });
+
+  it("startChat sends to the inbox-scoped route when inbox is provided", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "ChatStarted", chat_id: "c6", message_id: "m1" }]);
+    const out = await startChat.run(ctx, { user_id: "u1", text: "hi", inbox: "SN_INBOX_1" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/inboxes/SN_INBOX_1/chats/send");
+    expect(call(f).method).toBe("POST");
+    expect(out).toEqual({ chat_id: "c6", message_ids: ["m1"] });
+  });
+
+  it("getMessage fetches by chat_id and message_id and wraps as item", async () => {
+    const { ctx, f } = ctxCapturing([{ id: "m1", object: "Message" }]);
+    const out = await getMessage.run(ctx, { chat_id: "c1", message_id: "m1" });
+    expect(call(f)).toMatchObject({ method: "GET" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages/m1");
+    expect(out).toEqual({ item: { id: "m1", object: "Message" } });
+  });
+
+  it("deleteMessage sends DELETE and returns deleted:true on 204 no-content", async () => {
+    const f = vi.fn(async () => new Response(null, { status: 204 }));
+    const ctx = { client: new UnipileClient({ apiKey: "k", fetchImpl: f as unknown as typeof fetch }), accountId: "acc_1" };
+    const out = await deleteMessage.run(ctx, { chat_id: "c1", message_id: "m1" });
+    expect(call(f)).toMatchObject({ method: "DELETE" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages/m1");
+    expect(out).toEqual({ deleted: true });
+  });
+
+  it("markMessageRead POSTs to .../read and returns the result object (does not touch chat unread state)", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "MessageRead" }]);
+    const out = await markMessageRead.run(ctx, { chat_id: "c1", message_id: "m1" });
+    expect(call(f)).toMatchObject({ method: "POST", body: undefined });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages/m1/read");
+    expect(out).toEqual({ result: "MessageRead" });
+  });
+
+  it("forwardMessage POSTs destination chat_id and returns a plain-string message_id (not the union used by send/start)", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "MessageForwarded", message_id: "m2", chat_id: "c2" }]);
+    const out = await forwardMessage.run(ctx, { chat_id: "c1", message_id: "m1", destination_chat_id: "c2", text: "fyi" });
+    expect(call(f)).toMatchObject({ method: "POST", body: { chat_id: "c2", text: "fyi" } });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages/m1/forward");
+    expect(out).toEqual({ message_id: "m2", chat_id: "c2" });
+    expect(typeof out.message_id).toBe("string");
+  });
+
+  it("editMessage POSTs text to .../modify and is null-tolerant on the response", async () => {
+    const { ctx, f } = ctxCapturing([null]);
+    const out = await editMessage.run(ctx, { chat_id: "c1", message_id: "m1", text: "updated" });
+    expect(call(f)).toMatchObject({ method: "POST", body: { text: "updated" } });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages/m1/modify");
+    expect(out).toEqual({ item: null });
+  });
+
+  it("editMessage returns the updated message when the API does provide one", async () => {
+    const { ctx } = ctxCapturing([{ id: "m1", object: "Message", text: "updated" }]);
+    const out = await editMessage.run(ctx, { chat_id: "c1", message_id: "m1", text: "updated" });
+    expect(out).toEqual({ item: { id: "m1", object: "Message", text: "updated" } });
+  });
+
+  it("listParticipants paginates a group chat's participants", async () => {
+    const { ctx, f } = ctxCapturing([{ data: [{ object: "GroupParticipant", is_self: true, is_admin: false, user: { id: "u1" } }], next_cursor: "n1" }]);
+    const out = await listParticipants.run(ctx, { chat_id: "c1", cursor: "x" });
+    expect(call(f)).toMatchObject({ method: "GET" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/participants?cursor=x");
+    expect(out).toEqual({ items: [{ object: "GroupParticipant", is_self: true, is_admin: false, user: { id: "u1" } }], next_cursor: "n1" });
+  });
+
+  it("manageParticipants add POSTs to /participants with a user_id body", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "ParticipantAdded" }]);
+    const out = await manageParticipants.run(ctx, { chat_id: "c1", action: "add", user_id: "u1" });
+    expect(call(f)).toMatchObject({ method: "POST", body: { user_id: "u1" } });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/participants");
+    expect(out).toEqual({ result: "ParticipantAdded" });
+  });
+
+  it("manageParticipants remove DELETEs to /participants/{user_id} with no body", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "ParticipantRemoved" }]);
+    const out = await manageParticipants.run(ctx, { chat_id: "c1", action: "remove", user_id: "u1" });
+    expect(call(f)).toMatchObject({ method: "DELETE", body: undefined });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/participants/u1");
+    expect(out).toEqual({ result: "ParticipantRemoved" });
   });
 });
