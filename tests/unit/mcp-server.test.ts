@@ -3,6 +3,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { UnipileClient } from "../../src/core/client.js";
 import { buildServer } from "../../src/mcp/server.js";
+import { operations } from "../../src/core/operations/index.js";
 
 async function connect(responses: Array<{ status?: number; body: unknown }>) {
   let i = 0;
@@ -21,10 +22,10 @@ async function connect(responses: Array<{ status?: number; body: unknown }>) {
 }
 
 describe("MCP server", () => {
-  it("exposes all 22 tools with annotations", async () => {
+  it("exposes every registry tool with annotations", async () => {
     const { mcp } = await connect([]);
     const tools = await mcp.listTools();
-    expect(tools.tools).toHaveLength(22);
+    expect(tools.tools).toHaveLength(operations.length);
     const send = tools.tools.find((t) => t.name === "linkedin_send_message")!;
     expect(send.annotations?.destructiveHint).toBe(true);
     const list = tools.tools.find((t) => t.name === "linkedin_list_chats")!;
