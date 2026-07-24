@@ -1,0 +1,28 @@
+{
+  "name": "linkedin-mcp",
+  "version": "0.1.0",
+  "description": "LinkedIn MCP server + CLI backed by the Unipile v2 API",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=20.0.0" },
+  "bin": { "linkedin-mcp": "dist/mcp/index.js", "linkedin": "dist/cli/index.js" },
+  "files": ["dist", "skills"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:integration": "vitest run --project integration",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "commander": "^14.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
