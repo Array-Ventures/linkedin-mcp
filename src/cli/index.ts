@@ -2,6 +2,7 @@ import { CommanderError } from "commander";
 import { UnipileClient } from "../core/client.js";
 import { applyDotEnvLocal, loadConfig } from "../core/config.js";
 import { buildProgram, CliError } from "./build-program.js";
+import { registerRawCommand } from "./raw.js";
 
 async function main(): Promise<void> {
   applyDotEnvLocal(process.cwd());
@@ -14,6 +15,7 @@ async function main(): Promise<void> {
     writeErr: (l) => process.stderr.write(`${l}\n`),
     isTTY: process.stdout.isTTY === true,
   });
+  registerRawCommand(program, { client, defaultAccountId: cfg.accountId });
   program.exitOverride();
   try {
     await program.parseAsync(process.argv);
