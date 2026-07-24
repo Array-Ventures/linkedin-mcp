@@ -90,13 +90,15 @@ describe("whoami", () => {
       },
       { body: { object: "UserProfile", id: "me1" } },
       { status: 403, body: { type: "errors/insufficient_permissions", title: "No InMail" } },
+      { body: { data: [{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }] } },
     ]);
     const out = await whoami.run(ctx, {});
     expect(out.account).toMatchObject({ id: "acc_1" });
     expect(out.profile).toMatchObject({ id: "me1" });
     expect(out.inmail_credits).toBeNull();
     expect(out.products).toEqual({ classic: "running", sales_navigator: "disconnected" });
-    expect(f).toHaveBeenCalledTimes(3);
+    expect(out.inboxes).toEqual([{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }]);
+    expect(f).toHaveBeenCalledTimes(4);
   });
 
   it("reports products null when the account has no product map", async () => {

@@ -28,9 +28,10 @@ describe("integration op fuse", () => {
     const { ctx, request } = countingCtx();
     const runner = createOpRunner(ctx);
     await runner.run(listChats, {});
-    expect(request).toHaveBeenCalledTimes(1);
+    // listChats now discovers inboxes first (empty -> generic route): 2 requests
+    expect(request).toHaveBeenCalledTimes(2);
     runner.confirmMockProvider("mock");
     await runner.run(startChat, { user_id: "u", text: "x" }).catch(() => undefined); // shape errors irrelevant here
-    expect(request).toHaveBeenCalledTimes(2);
+    expect(request).toHaveBeenCalledTimes(3);
   });
 });

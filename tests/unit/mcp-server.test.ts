@@ -33,7 +33,10 @@ describe("MCP server", () => {
   });
 
   it("runs a read tool and returns structuredContent + text", async () => {
-    const { mcp } = await connect([{ body: { data: [{ id: "c1" }], next_cursor: "n" } }]);
+    const { mcp } = await connect([
+      { body: { data: [{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }] } },
+      { body: { data: [{ id: "c1" }], next_cursor: "n" } },
+    ]);
     const res = await mcp.callTool({ name: "linkedin_list_chats", arguments: { limit: 1 } });
     expect(res.isError).toBeFalsy();
     expect(res.structuredContent).toEqual({ items: [{ id: "c1" }], next_cursor: "n" });

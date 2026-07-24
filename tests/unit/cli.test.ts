@@ -25,7 +25,10 @@ const argv = (s: string) => ["node", "linkedin", ...s.split(" ")];
 
 describe("linkedin CLI", () => {
   it("runs chats list and prints JSON when piped", async () => {
-    const { program, out } = makeCli([{ body: { data: [{ id: "c1" }], next_cursor: "n" } }]);
+    const { program, out } = makeCli([
+      { body: { data: [{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }] } },
+      { body: { data: [{ id: "c1" }], next_cursor: "n" } },
+    ]);
     await program.parseAsync(argv("chats list --limit 2"));
     const parsed = JSON.parse(out.join("\n"));
     expect(parsed).toEqual({ items: [{ id: "c1" }], next_cursor: "n" });
@@ -43,7 +46,7 @@ describe("linkedin CLI", () => {
   it("respects --account override", async () => {
     const { program, f } = makeCli([{ body: { data: [] } }]);
     await program.parseAsync(argv("chats list --account acc_override"));
-    expect(String((f.mock.calls[0] as unknown as [URL])[0])).toContain("/v2/acc_override/inboxes/CLASSIC_PRIMARY/chats");
+    expect(String((f.mock.calls[0] as unknown as [URL])[0])).toContain("/v2/acc_override/inboxes");
   });
 
   it("exits 1 with stderr JSON on API errors in JSON mode", async () => {

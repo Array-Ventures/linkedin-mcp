@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { UsageError } from "../errors.js";
+import { resolveDefaultInbox } from "../inboxes.js";
+import { getAccountProducts } from "../accounts.js";
 import { defineOperation } from "./types.js";
 import { cursorPagination, itemOutputShape, pageOutputShape, toIdArray, toPage } from "./shared.js";
 import type { ListEnvelope } from "./shared.js";
@@ -17,21 +19,28 @@ export const listChats = defineOperation({
       .string()
       .min(1)
       .optional()
-      .describe("Inbox id (default CLASSIC_PRIMARY). Known: CLASSIC_PRIMARY, CLASSIC_ARCHIVED, CLASSIC_SPAM, CLASSIC_JOBS; Sales Navigator/Recruiter accounts expose more via GET /inboxes"),
+      .describe("Inbox id to read from. Omit to auto-discover (prefers CLASSIC_PRIMARY). Available inboxes are listed by linkedin_whoami (e.g. CLASSIC_ARCHIVED, CLASSIC_JOBS, Sales Navigator/Recruiter inboxes)"),
     unread: z.boolean().optional().describe("Only chats with unread messages"),
     ...cursorPagination,
   },
   outputShape: pageOutputShape,
   annotations: READ,
   cli: { group: "chats", command: "list" },
-  run: async ({ client, accountId }, input) =>
-    toPage(
+  run: async ({ client, accountId }, input) => {
+    // LinkedIn requires inbox-scoped listing; providers without inboxes use the generic route.
+    const inbox = (input.inbox as string | undefined) ?? (await resolveDefaultInbox(client, accountId));
+    const path =
+      inbox === null || inbox === undefined
+        ? `/v2/${accountId}/chats`
+        : `/v2/${accountId}/inboxes/${encodeURIComponent(inbox)}/chats`;
+    return toPage(
       await client.request<ListEnvelope>({
         method: "GET",
-        path: `/v2/${accountId}/inboxes/${encodeURIComponent((input.inbox as string | undefined) ?? "CLASSIC_PRIMARY")}/chats`,
+        path,
         query: { is_unread: input.unread as boolean | undefined, limit: input.limit as number | undefined, cursor: input.cursor as string | undefined },
       })
-    ),
+    );
+  },
 });
 
 export const getChat = defineOperation({
@@ -134,6 +143,13 @@ export const startChat = defineOperation({
     }
     const body: Record<string, unknown> = { text: input.text, users_ids: input.user_id };
     if (input.subject !== undefined) {
+      // Preflight: fail fast with a clear message when Sales Navigator is not connected.
+      const products = await getAccountProducts(client, accountId);
+      if (products !== null && products.sales_navigator !== "running") {
+        throw new UsageError(
+          `Sales Navigator is not connected on this account (connected products: ${Object.keys(products).join(", ") || "none"}). Send a classic message or InMail instead.`
+        );
+      }
       body.specifics = { linkedin: { sales_navigator: { subject: input.subject } } };
     } else {
       const classic: Record<string, unknown> = {};

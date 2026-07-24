@@ -68,3 +68,30 @@ export async function resolveAccountId(client: UnipileClient, explicit?: string)
   cache.set(client, only.id);
   return only.id;
 }
+
+const productsCache = new WeakMap<UnipileClient, Map<string, Record<string, string> | null>>();
+
+/**
+ * Connected LinkedIn products for the account (e.g. { classic: "running", sales_navigator: "running" }),
+ * from account.metadata.products_connection_status. Null when the API exposes no product map.
+ * Cached per client+account for the process lifetime.
+ */
+export async function getAccountProducts(
+  client: UnipileClient,
+  accountId: string
+): Promise<Record<string, string> | null> {
+  let perClient = productsCache.get(client);
+  if (perClient === undefined) {
+    perClient = new Map();
+    productsCache.set(client, perClient);
+  }
+  const cached = perClient.get(accountId);
+  if (cached !== undefined) return cached;
+  const account = await client.request<{ metadata?: { products_connection_status?: Record<string, string> } }>({
+    method: "GET",
+    path: `/v2/accounts/${encodeURIComponent(accountId)}`,
+  });
+  const products = account.metadata?.products_connection_status ?? null;
+  perClient.set(accountId, products);
+  return products;
+}
