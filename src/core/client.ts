@@ -42,7 +42,15 @@ export class UnipileClient {
   }
 
   async request<T>(spec: RequestSpec): Promise<T> {
+    // SECURITY: spec.path must be a same-origin API path. Absolute, protocol-relative, or
+    // backslash forms would override the validated base origin and leak X-API-KEY elsewhere.
+    if (!spec.path.startsWith("/") || spec.path.startsWith("//") || spec.path.includes("\\")) {
+      throw new Error(`Invalid API path "${spec.path}": must be a relative path starting with a single "/".`);
+    }
     const url = new URL(spec.path, this.baseUrl);
+    if (url.origin !== new URL(this.baseUrl).origin) {
+      throw new Error(`Refusing cross-origin request to ${url.origin}.`);
+    }
     for (const [key, value] of Object.entries(spec.query ?? {})) {
       if (value === undefined) continue;
       if (Array.isArray(value)) for (const v of value) url.searchParams.append(key, v);

@@ -58,6 +58,15 @@ describe("UnipileClient", () => {
     expect(err.type).toBe("http/504");
   });
 
+  it("refuses absolute and protocol-relative paths (key exfiltration guard)", async () => {
+    const f = fakeFetch(200, {});
+    const client = new UnipileClient({ apiKey: "k", fetchImpl: f as unknown as typeof fetch });
+    await expect(client.request({ method: "GET", path: "https://evil.example.com/x" })).rejects.toThrow(/relative path/);
+    await expect(client.request({ method: "GET", path: "//evil.example.com/x" })).rejects.toThrow(/relative path/);
+    await expect(client.request({ method: "GET", path: "\\evil\\x" })).rejects.toThrow(/relative path/);
+    expect(f).not.toHaveBeenCalled();
+  });
+
   it("rejects non-unipile.com base URLs unless explicitly allowed", () => {
     expect(() => new UnipileClient({ apiKey: "k", baseUrl: "https://evil.example.com" })).toThrow(/unipile\.com/);
     expect(() => new UnipileClient({ apiKey: "k", baseUrl: "http://api.unipile.com" })).toThrow(/HTTPS/);
