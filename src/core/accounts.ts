@@ -16,9 +16,15 @@ interface AccountsPage {
 const cache = new WeakMap<UnipileClient, string>();
 const PAGE_LIMIT = 50;
 const MAX_PAGES = 5;
+const ACCOUNT_ID_RE = /^acc_[A-Za-z0-9_-]+$/;
 
 export async function resolveAccountId(client: UnipileClient, explicit?: string): Promise<string> {
-  if (explicit) return explicit;
+  if (explicit) {
+    if (!ACCOUNT_ID_RE.test(explicit)) {
+      throw new ConfigError(`Invalid account id "${explicit}" — expected an id like acc_xxx from /v2/accounts/`);
+    }
+    return explicit;
+  }
   const cached = cache.get(client);
   if (cached) return cached;
 

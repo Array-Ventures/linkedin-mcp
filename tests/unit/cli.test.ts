@@ -71,4 +71,10 @@ describe("renderHuman", () => {
     expect(page).toContain("next_cursor: n2");
     expect(renderHuman({ result: "Ok" })).toContain('"result"');
   });
+
+  it("renders offset-based pagination fields", () => {
+    const page = renderHuman({ items: [{ id: "c1" }], offset: 2, next_offset: 4 });
+    expect(page).toContain("offset: 2");
+    expect(page).toContain("next_offset: 4");
+  });
 });

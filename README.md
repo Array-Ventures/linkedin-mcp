@@ -26,22 +26,23 @@ The build outputs to `dist/` with two entry points:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `UNIPILE_API_KEY` | Yes | — | Unipile API key for authentication. Get one at https://unipile.ai. |
-| `UNIPILE_BASE_URL` | No | `https://api.unipile.ai` | Base URL for Unipile API (allows custom/test servers). |
-| `UNIPILE_ACCOUNT_ID` | No | — | Explicit account ID override (auto-resolved from auth token if omitted). |
-| `UNIPILE_ALLOW_CUSTOM_BASE` | No | `false` | Set to `true` to allow non-standard UNIPILE_BASE_URL (security check). |
-| `UNIPILE_API_KEY_TEST` | No | — | Separate API key for integration test suite. |
-| `UNIPILE_BASE_URL_TEST` | No | `https://api-test.unipile.ai` | Test server URL for integration tests. |
-| `UNIPILE_ACCOUNT_ID_TEST` | No | — | Test account ID (if different from production). |
-| `UNIPILE_TEST_LIVE` | No | `0` | Set to `1` to run integration tests against live test server (requires `UNIPILE_API_KEY_TEST`). |
+| `UNIPILE_API_KEY` | Yes | — | Unipile API key for authentication. Get one from the [Unipile dashboard](https://dashboard.unipile.com). |
+| `UNIPILE_BASE_URL` | No | `https://api.unipile.com` | Base URL for the Unipile API. |
+| `UNIPILE_ACCOUNT_ID` | No | — | Explicit account ID override (auto-resolved from the API key if omitted). |
+| `UNIPILE_ALLOW_CUSTOM_BASE` | No | unset | Set to `1` to allow a `UNIPILE_BASE_URL` whose host is not `unipile.com` or a `*.unipile.com` subdomain (security check). |
+| `UNIPILE_API_KEY_TEST` | No | — | API key for a separate Unipile app, pointed at a mock-provider test account, used only by the integration test suite. |
+| `UNIPILE_ACCOUNT_ID_TEST` | No | — | The mock-provider test account id in that separate app. |
+| `UNIPILE_BASE_URL_TEST` | No | `https://api.unipile.com` | Base URL for the test app (only needed if it differs from the default). |
+| `UNIPILE_TEST_LIVE` | No | `0` | Set to `1` to actually run the integration suite against the mock-provider test account (requires `UNIPILE_API_KEY_TEST` / `UNIPILE_ACCOUNT_ID_TEST`); `0` (or unset) skips the suite. |
 
 ### Example `.env.local`
 
 ```
 UNIPILE_API_KEY=uapi_xxxxxxxxxxxxxxxxxxxxxxxx
-UNIPILE_BASE_URL=https://api.unipile.ai
-UNIPILE_ALLOW_CUSTOM_BASE=false
+UNIPILE_BASE_URL=https://api.unipile.com
 UNIPILE_API_KEY_TEST=uapi_test_xxxxxxxxxxxx
+UNIPILE_ACCOUNT_ID_TEST=acc_xxxxxxxxxxxx
+UNIPILE_BASE_URL_TEST=https://api.unipile.com
 UNIPILE_TEST_LIVE=0
 ```
 
@@ -107,39 +108,49 @@ See `skills/linkedin/SKILL.md` for the full command reference, including:
 
 ### Unit Tests (Offline)
 
-By construction, unit tests do not make network calls. Run them with:
+Unit tests are offline by construction: the global `fetch` is replaced with a function that
+throws, so the only way HTTP happens in a unit test is via an explicitly injected `fetchImpl`
+returning a fake `Response`. Run them with:
 
 ```bash
 npm test
 ```
 
-Tests live in `tests/` and validate parsing, validation, and formatting logic in isolation.
+Tests live in `tests/unit/` and validate parsing, validation, and formatting logic in isolation.
+No unit test makes a real network call, and none can reach Unipile's production API.
 
-### Integration Tests (Mock Environment)
+### Integration Tests (Mock-Provider Test Account)
 
-Integration tests use a mock Unipile server to validate request/response handling without touching production or the live test environment:
-
-```bash
-UNIPILE_TEST_LIVE=0 npm run test:integration
-```
-
-Or run the test script directly:
+Integration tests run ONLY against a Unipile **mock-provider test account**, which lives in a
+*separate* Unipile app from production — never against the live LinkedIn API or the production
+account. Launch them with:
 
 ```bash
 bash scripts/run-integration.sh
 ```
 
-**Important**: Integration tests never touch the live LinkedIn API or the production Unipile account. They run against a local mock server or isolated test environment only.
+This script:
+1. Extracts ONLY `UNIPILE_API_KEY_TEST`, `UNIPILE_ACCOUNT_ID_TEST`, and `UNIPILE_BASE_URL_TEST`
+   from `.env.local` — nothing else, and never `UNIPILE_API_KEY`.
+2. Launches vitest under a scrubbed `env -i` environment containing only those three variables
+   (plus `PATH`/`HOME`/`TERM`) and `UNIPILE_TEST_LIVE=1`, so production credentials can never
+   enter the test process, even if they're present in your shell or `.env.local`.
+3. Relies on a safety fuse (`tests/helpers/op-fuse.ts`) that fetches the target account before
+   any test runs and throws unless its provider is verified to be `"mock"`. Every mutating
+   operation is blocked until that check passes.
 
-### Integration Tests (Live Test Environment)
-
-To run against the live test environment (requires `UNIPILE_API_KEY_TEST` and `UNIPILE_BASE_URL_TEST`):
+You can also invoke vitest directly:
 
 ```bash
-UNIPILE_TEST_LIVE=1 npm run test:integration
+npm run test:integration
 ```
 
-This is intended for pre-deployment verification and must never run against production.
+but without `UNIPILE_TEST_LIVE=1` set (and the `*_TEST` credentials present), the suite is
+skipped entirely — running it with no environment variables configured exits `0` having run
+nothing. There is no local mock HTTP server; "mock" refers to Unipile's own mock-provider
+account type in that separate test app.
+
+Production is never touched by any automated test in this repository.
 
 ## Safety & Behavioral Rules
 
@@ -158,14 +169,14 @@ This is intended for pre-deployment verification and must never run against prod
 ### Access Control
 
 - Keep `UNIPILE_API_KEY` and `UNIPILE_BASE_URL` secret. Do not commit `.env.local` or API keys to version control.
-- `UNIPILE_ALLOW_CUSTOM_BASE=false` by default; set to `true` only when using a trusted custom server.
-- Test credentials (`UNIPILE_API_KEY_TEST`) must be separate from production and used only in test environments.
+- `UNIPILE_ALLOW_CUSTOM_BASE` is unset (disabled) by default; set it to `1` only when using a trusted custom server.
+- Test credentials (`UNIPILE_API_KEY_TEST`) belong to a separate Unipile app pointed at a mock-provider test account — never production.
 
 ## Troubleshooting
 
 **"missing UNIPILE_API_KEY"**
 - Set `UNIPILE_API_KEY` in your environment or `.env.local`.
-- Verify the key is valid at https://unipile.ai/account.
+- Verify the key is valid in the [Unipile dashboard](https://dashboard.unipile.com).
 
 **"429 Too Many Requests"**
 - You've hit a rate limit. Wait the time specified in the error response, then retry (manually).

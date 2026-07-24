@@ -42,4 +42,12 @@ describe("linkedin raw", () => {
       program.parseAsync(["node", "linkedin", "raw", "post", "/x", "--body", "{bad"])
     ).rejects.toThrow(/JSON/);
   });
+
+  it("throws an InvalidArgumentError (commander.invalidArgument) for a bad --body so the bin prints it", async () => {
+    const { program } = makeRaw([{ body: {} }]);
+    const err = await program
+      .parseAsync(["node", "linkedin", "raw", "post", "/x", "--body", "{bad"])
+      .catch((e: unknown) => e);
+    expect(err).toMatchObject({ code: "commander.invalidArgument", message: expect.stringMatching(/JSON/) });
+  });
 });

@@ -12,7 +12,10 @@ const BASE = process.env.UNIPILE_BASE_URL_TEST ?? "https://api.unipile.com";
 const enabled = KEY !== "" && ACCOUNT !== "" && process.env.UNIPILE_TEST_LIVE === "1";
 
 (enabled ? describe : describe.skip)("Unipile mock test environment", () => {
-  const client = new UnipileClient({ apiKey: KEY, baseUrl: BASE });
+  // Defensive: `describe.skip` still executes this callback body during collection even when
+  // `enabled` is false, so an explicitly-empty env var (e.g. UNIPILE_BASE_URL_TEST="") must
+  // never be able to throw here — fall back to safe placeholders rather than empty strings.
+  const client = new UnipileClient({ apiKey: KEY || "unused", baseUrl: BASE || "https://api.unipile.com" });
   const runner = createOpRunner({ client, accountId: ACCOUNT });
   let mockUserId = "";
 

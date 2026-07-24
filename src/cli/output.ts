@@ -12,7 +12,7 @@ export function renderHuman(result: Record<string, unknown>): string {
   if (Array.isArray(result.items)) {
     const lines = (result.items as Array<Record<string, unknown>>).map(summarizeItem);
     if (lines.length === 0) lines.push("(no results)");
-    for (const key of ["next_cursor", "total_count", "has_more"]) {
+    for (const key of ["next_cursor", "total_count", "has_more", "offset", "next_offset"]) {
       if (result[key] !== undefined) lines.push(`${key}: ${String(result[key])}`);
     }
     return lines.join("\n");

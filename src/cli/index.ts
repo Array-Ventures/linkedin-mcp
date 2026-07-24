@@ -23,7 +23,13 @@ async function main(): Promise<void> {
     if (err instanceof CliError) {
       process.exitCode = err.exitCode; // message already printed by the action handler
     } else if (err instanceof CommanderError) {
-      // commander already wrote its own message; help/version are success
+      // commander already wrote its own message for most cases; help/version are success.
+      // InvalidArgumentError thrown from inside an action handler (e.g. `raw`'s custom
+      // argument parsers/body validation) reaches here as a CommanderError but commander
+      // never printed it, so print it ourselves before setting the exit code.
+      if (err.code === "commander.invalidArgument") {
+        process.stderr.write(`${err.message}\n`);
+      }
       process.exitCode = err.code === "commander.helpDisplayed" || err.code === "commander.version" ? 0 : 2;
     } else {
       process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);

@@ -20,6 +20,13 @@ describe("resolveAccountId", () => {
     expect(f).not.toHaveBeenCalled();
   });
 
+  it("rejects an explicit id that isn't a well-formed acc_ id, with zero fetch calls", async () => {
+    const { client, f } = clientReturning([]);
+    await expect(resolveAccountId(client, "https://evil")).rejects.toThrow(ConfigError);
+    await expect(resolveAccountId(client, "x/../y")).rejects.toThrow(ConfigError);
+    expect(f).not.toHaveBeenCalled();
+  });
+
   it("auto-detects a single running linkedin account and caches it", async () => {
     const { client, f } = clientReturning([{ object: "Accounts", data: [acc("acc_1")], has_more: false }]);
     await expect(resolveAccountId(client)).resolves.toBe("acc_1");
