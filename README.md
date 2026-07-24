@@ -5,7 +5,7 @@ An MCP (Model Context Protocol) server and CLI for operating LinkedIn at scale t
 ## What It Is
 
 **linkedin-mcp** exposes:
-- **MCP Server** (`dist/mcp/index.js`): 40-tool server for Claude Code and Claude Desktop to operate LinkedIn via Unipile.
+- **MCP Server** (`dist/mcp/index.js`): 41-tool server for Claude Code and Claude Desktop to operate LinkedIn via Unipile.
 - **CLI** (`linkedin`): Human-friendly command-line interface (`dist/cli/index.js`) for direct LinkedIn operations, with output formatted for both terminals and piping.
 - **Agent Skill** (`skills/linkedin/SKILL.md`): Reusable skill for Claude and agents to safely operate LinkedIn.
 
@@ -61,7 +61,7 @@ To use the MCP server with Claude Desktop, add this to `claude_desktop_config.js
 }
 ```
 
-Restart Claude Desktop. All 40 tools will now be available to Claude for LinkedIn operations.
+Restart Claude Desktop. All 41 tools will now be available to Claude for LinkedIn operations.
 
 ## CLI Quickstart
 

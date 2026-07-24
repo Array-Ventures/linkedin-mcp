@@ -358,3 +358,47 @@ export const manageParticipants = defineOperation({
     return { result: res.object };
   },
 });
+
+interface MessageAttachment {
+  id?: string;
+  type?: string;
+  url?: string;
+  url_expires_at?: string;
+  filename?: string;
+  mimetype?: string;
+  file_size?: number;
+  is_unavailable?: boolean;
+}
+
+export const getAttachmentLinks = defineOperation({
+  name: "linkedin_get_attachment_links",
+  title: "Get download links for a message's attachments",
+  description:
+    "List the attachments on a message with DIRECT DOWNLOAD LINKS. Returns each attachment's url (a pre-signed, time-limited link you can fetch with curl — no API key needed), url_expires_at, filename, mimetype, file_size and type. Binary content is never returned through this tool; download it yourself from the url before it expires. Pass attachment_id to narrow to one attachment.",
+  mutates: false,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id containing the message"),
+    message_id: z.string().min(1).describe("Message id from linkedin_list_messages"),
+    attachment_id: z.string().min(1).optional().describe("Return only this attachment (default: all on the message)"),
+  },
+  outputShape: { attachments: z.array(z.record(z.unknown())) },
+  annotations: READ,
+  cli: { group: "messages", command: "attachments" },
+  run: async ({ client, accountId }, input) => {
+    // The attachment endpoint streams raw bytes; the Message object already carries pre-signed
+    // urls, so we surface those instead of piping binary through the tool layer.
+    const message = await client.request<{ attachments?: MessageAttachment[] }>({
+      method: "GET",
+      path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}/messages/${encodeURIComponent(input.message_id as string)}`,
+    });
+    const wanted = input.attachment_id as string | undefined;
+    const all = message.attachments ?? [];
+    const picked = wanted === undefined ? all : all.filter((a) => a.id === wanted);
+    if (wanted !== undefined && picked.length === 0) {
+      throw new UsageError(
+        `Message has no attachment with id "${wanted}". Available ids: ${all.map((a) => a.id).filter(Boolean).join(", ") || "(none)"}.`
+      );
+    }
+    return { attachments: picked };
+  },
+});

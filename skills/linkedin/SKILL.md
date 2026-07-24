@@ -43,8 +43,11 @@ Managing sent messages (your own only) and threads:
     linkedin messages forward --chat-id <id> --message-id <id> --destination-chat-id <id>
     linkedin messages read --chat-id <id> --message-id <id>   # one message, does NOT clear chat unread_count
     linkedin react message --chat-id <id> --message-id <id> --reaction "👍" --action add   # emoji, not the linkedin_* enum
+    linkedin messages attachments --chat-id <id> --message-id <id>   # download LINKS, not bytes
     linkedin participants list --chat-id <id>                 # group chats only; fails on 1-to-1
     linkedin participants manage --chat-id <id> --user-id <id> --action add|remove
+
+Attachments come back as pre-signed `url`s with an `url_expires_at` — fetch them yourself (`curl -o deck.pdf "<url>"`), no API key needed. Binary never flows through the tools.
 
 ## People & network
 

@@ -11,6 +11,7 @@ import {
   listParticipants,
   manageParticipants,
   markChatRead,
+  getAttachmentLinks,
   markMessageRead,
   sendMessage,
   startChat,
@@ -239,5 +240,32 @@ describe("messaging ops", () => {
     expect(call(f)).toMatchObject({ method: "DELETE", body: undefined });
     expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/participants/u1");
     expect(out).toEqual({ result: "ParticipantRemoved" });
+  });
+
+  it("getAttachmentLinks returns pre-signed urls from the message, never binary", async () => {
+    const ATTACHMENTS = {
+      object: "Message",
+      id: "m1",
+      attachments: [
+        { object: "Attachment", id: "a1", type: "file", filename: "deck.pdf", mimetype: "application/pdf", file_size: 1024, url: "https://cdn.example/deck.pdf?sig=x", url_expires_at: "2026-07-25T00:00:00.000Z" },
+        { object: "Attachment", id: "a2", type: "img", mimetype: "image/png", url: "https://cdn.example/pic.png?sig=y" },
+      ],
+    };
+    const { ctx, f } = ctxCapturing([ATTACHMENTS]);
+    const all = await getAttachmentLinks.run(ctx, { chat_id: "c1", message_id: "m1" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages/m1");
+    expect((all.attachments as unknown[])).toHaveLength(2);
+    expect((all.attachments as Array<Record<string, unknown>>)[0]!.url).toBe("https://cdn.example/deck.pdf?sig=x");
+
+    const one = ctxCapturing([ATTACHMENTS]);
+    const picked = await getAttachmentLinks.run(one.ctx, { chat_id: "c1", message_id: "m1", attachment_id: "a2" });
+    expect((picked.attachments as Array<Record<string, unknown>>).map((a) => a.id)).toEqual(["a2"]);
+  });
+
+  it("getAttachmentLinks errors helpfully for an unknown attachment id", async () => {
+    const { ctx } = ctxCapturing([{ object: "Message", id: "m1", attachments: [{ id: "a1" }] }]);
+    await expect(
+      getAttachmentLinks.run(ctx, { chat_id: "c1", message_id: "m1", attachment_id: "nope" })
+    ).rejects.toThrow(/no attachment with id "nope".*a1/s);
   });
 });

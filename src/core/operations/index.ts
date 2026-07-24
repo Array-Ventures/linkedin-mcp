@@ -3,6 +3,7 @@ import {
   deleteMessage,
   editMessage,
   forwardMessage,
+  getAttachmentLinks,
   getChat,
   getMessage,
   listChats,
@@ -41,7 +42,7 @@ export const operations: OperationDef[] = [
   // messaging
   listChats, getChat, listMessages, sendMessage, startChat, markChatRead,
   getMessage, deleteMessage, markMessageRead, forwardMessage, editMessage,
-  listParticipants, manageParticipants,
+  listParticipants, manageParticipants, getAttachmentLinks,
   // network
   getProfile, getCompany, listConnections, listInvitations, sendInvitation, respondInvitation, followUser,
   removeConnection,

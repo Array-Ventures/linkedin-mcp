@@ -17,18 +17,28 @@ export interface UnipileClientOptions {
 
 export const DEFAULT_BASE_URL = "https://api.unipile.com";
 
-/** Last-seen x-ratelimit-* headers — Unipile's authoritative counters, read fresh off every response. */
+/**
+ * One rate window as reported by Unipile's x-ratelimit-* headers — its authoritative counters,
+ * read fresh off every response. Windows are per-endpoint, so we keep one per path.
+ */
 export interface RateLimitSnapshot {
   limit: number;
   remaining: number;
-  reset?: string;
+  /** Seconds remaining in the window at capture time (the header is a duration, not a timestamp). */
+  resetInSeconds?: number;
   path: string;
+  /** Epoch ms when this snapshot was captured, used to expire it once its window has elapsed. */
+  capturedAt: number;
 }
 
 export class UnipileClient {
   readonly baseUrl: string;
-  /** Updated on every response (including 429s) that carries x-ratelimit-* headers. */
-  lastRateLimit: RateLimitSnapshot | undefined;
+  /**
+   * Every rate window seen on this client, keyed by request path. Multi-call operations touch
+   * several endpoints with independent windows; keeping them all lets callers report the
+   * tightest one rather than whichever happened to be last.
+   */
+  readonly rateWindows = new Map<string, RateLimitSnapshot>();
   private readonly apiKey: string;
   private readonly fetchImpl: typeof fetch;
   private readonly timeoutMs: number;
@@ -81,12 +91,16 @@ export class UnipileClient {
     const limitHeader = res.headers.get("x-ratelimit-limit");
     const remainingHeader = res.headers.get("x-ratelimit-remaining");
     if (limitHeader !== null && remainingHeader !== null && /^\d+$/.test(limitHeader) && /^\d+$/.test(remainingHeader)) {
-      this.lastRateLimit = {
+      const resetHeader = res.headers.get("x-ratelimit-reset");
+      const snapshot: RateLimitSnapshot = {
         limit: Number(limitHeader),
         remaining: Number(remainingHeader),
-        reset: res.headers.get("x-ratelimit-reset") ?? undefined,
         path: spec.path,
+        capturedAt: Date.now(),
       };
+      // The header is a duration in seconds, not an epoch timestamp.
+      if (resetHeader !== null && /^\d+$/.test(resetHeader)) snapshot.resetInSeconds = Number(resetHeader);
+      this.rateWindows.set(spec.path, snapshot);
     }
     if (!res.ok) throw await toApiError(res);
     if (res.status === 204) return undefined as T;
