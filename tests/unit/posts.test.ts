@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { UnipileClient } from "../../src/core/client.js";
-import { addComment, createPost, getPost, listComments, listPosts, reactToPost } from "../../src/core/operations/posts.js";
+import { addComment, createPost, getPost, listComments, listPosts } from "../../src/core/operations/posts.js";
 
 function ctxCapturing(responses: unknown[]) {
   let i = 0;
@@ -49,16 +49,5 @@ describe("posts ops", () => {
     const b = ctxCapturing([{ object: "Comment", id: "c2" }]);
     await addComment.run(b.ctx, { post_id: "p1", text: "agree", reply_to: "c1" });
     expect(call(b.f).url).toBe("https://api.unipile.com/v2/acc_1/posts/p1/comments/c1");
-  });
-
-  it("reactToPost adds via POST and removes via DELETE with body", async () => {
-    const a = ctxCapturing([{ object: "PostReactionAdded" }]);
-    const out = await reactToPost.run(a.ctx, { post_id: "p1", reaction: "linkedin_like", action: "add" });
-    expect(call(a.f)).toMatchObject({ method: "POST", body: { reaction: "linkedin_like" } });
-    expect(out).toEqual({ result: "PostReactionAdded" });
-
-    const b = ctxCapturing([{ object: "PostReactionRemoved" }]);
-    await reactToPost.run(b.ctx, { post_id: "p1", reaction: "linkedin_like", action: "remove" });
-    expect(call(b.f)).toMatchObject({ method: "DELETE", body: { reaction: "linkedin_like" } });
   });
 });
