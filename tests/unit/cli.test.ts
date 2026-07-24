@@ -43,7 +43,7 @@ describe("linkedin CLI", () => {
   it("respects --account override", async () => {
     const { program, f } = makeCli([{ body: { data: [] } }]);
     await program.parseAsync(argv("chats list --account acc_override"));
-    expect(String((f.mock.calls[0] as unknown as [URL])[0])).toContain("/v2/acc_override/chats");
+    expect(String((f.mock.calls[0] as unknown as [URL])[0])).toContain("/v2/acc_override/inboxes/CLASSIC_PRIMARY/chats");
   });
 
   it("exits 1 with stderr JSON on API errors in JSON mode", async () => {
