@@ -15,8 +15,10 @@ Shows the connected account, which LinkedIn products it has (`products`: classic
 
 ## Inbox & messaging
 
-    linkedin chats list --unread --limit 10          # CLASSIC_PRIMARY inbox by default
+    linkedin chats list --limit 10                   # CLASSIC_PRIMARY inbox by default (auto-discovered)
     linkedin chats list --inbox CLASSIC_ARCHIVED     # other inboxes: CLASSIC_SPAM, CLASSIC_JOBS, Sales Nav/Recruiter variants
+
+LinkedIn cannot filter by unread server-side — check each chat's `unread_count` in the JSON (0 = read, >0 = unread, -1 = manually marked unread) and follow `next_cursor` if you need more.
     linkedin messages list --chat-id <id>
     linkedin messages send --chat-id <id> --text "..."     # existing conversation
     linkedin chats start --user-id <id> --text "..."       # NEW conversation (outreach!)

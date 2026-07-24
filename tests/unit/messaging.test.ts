@@ -23,9 +23,9 @@ describe("messaging ops", () => {
 
   it("listChats auto-discovers inboxes and prefers CLASSIC_PRIMARY (LinkedIn 501s the generic /chats route)", async () => {
     const { ctx, f } = ctxCapturing([INBOXES, { data: [{ id: "c1" }], next_cursor: "n1" }]);
-    const out = await listChats.run(ctx, { unread: true, limit: 5 });
+    const out = await listChats.run(ctx, { limit: 5 });
     expect(call(f, 0).url).toBe("https://api.unipile.com/v2/acc_1/inboxes");
-    expect(call(f, 1).url).toBe("https://api.unipile.com/v2/acc_1/inboxes/CLASSIC_PRIMARY/chats?is_unread=true&limit=5");
+    expect(call(f, 1).url).toBe("https://api.unipile.com/v2/acc_1/inboxes/CLASSIC_PRIMARY/chats?limit=5");
     expect(out).toEqual({ items: [{ id: "c1" }], next_cursor: "n1" });
   });
 

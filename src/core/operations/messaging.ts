@@ -12,7 +12,7 @@ export const listChats = defineOperation({
   name: "linkedin_list_chats",
   title: "List LinkedIn chats",
   description:
-    "List LinkedIn conversations from one inbox, most recent first (LinkedIn requires inbox-scoped listing). Default inbox CLASSIC_PRIMARY; others: CLASSIC_ARCHIVED, CLASSIC_SPAM, CLASSIC_JOBS, plus Sales Navigator/Recruiter inboxes when subscribed. Set unread=true to only see chats with unread messages. Returned chat ids feed linkedin_list_messages / linkedin_send_message.",
+    "List LinkedIn conversations from one inbox, most recent first (LinkedIn requires inbox-scoped listing). Default inbox CLASSIC_PRIMARY; others: CLASSIC_ARCHIVED, CLASSIC_SPAM, CLASSIC_JOBS, plus Sales Navigator/Recruiter inboxes when subscribed. LinkedIn cannot filter by unread server-side — check each returned chat's unread_count (0 = read, >0 = unread messages, -1 = manually marked unread) and paginate with cursor as needed. Returned chat ids feed linkedin_list_messages / linkedin_send_message.",
   mutates: false,
   inputShape: {
     inbox: z
@@ -20,7 +20,6 @@ export const listChats = defineOperation({
       .min(1)
       .optional()
       .describe("Inbox id to read from. Omit to auto-discover (prefers CLASSIC_PRIMARY). Available inboxes are listed by linkedin_whoami (e.g. CLASSIC_ARCHIVED, CLASSIC_JOBS, Sales Navigator/Recruiter inboxes)"),
-    unread: z.boolean().optional().describe("Only chats with unread messages"),
     ...cursorPagination,
   },
   outputShape: pageOutputShape,
@@ -37,7 +36,7 @@ export const listChats = defineOperation({
       await client.request<ListEnvelope>({
         method: "GET",
         path,
-        query: { is_unread: input.unread as boolean | undefined, limit: input.limit as number | undefined, cursor: input.cursor as string | undefined },
+        query: { limit: input.limit as number | undefined, cursor: input.cursor as string | undefined },
       })
     );
   },
