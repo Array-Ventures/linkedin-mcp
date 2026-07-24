@@ -80,9 +80,14 @@ describe("search ops", () => {
 });
 
 describe("whoami", () => {
-  it("aggregates account + profile and tolerates missing inmail credits", async () => {
+  it("aggregates account + profile, lifts connected products, tolerates missing inmail credits", async () => {
     const { ctx, f } = ctxCapturing([
-      { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
+      {
+        body: {
+          object: "Account", id: "acc_1", provider: "linkedin", status: "running",
+          metadata: { products_connection_status: { classic: "running", sales_navigator: "disconnected" } },
+        },
+      },
       { body: { object: "UserProfile", id: "me1" } },
       { status: 403, body: { type: "errors/insufficient_permissions", title: "No InMail" } },
     ]);
@@ -90,7 +95,17 @@ describe("whoami", () => {
     expect(out.account).toMatchObject({ id: "acc_1" });
     expect(out.profile).toMatchObject({ id: "me1" });
     expect(out.inmail_credits).toBeNull();
+    expect(out.products).toEqual({ classic: "running", sales_navigator: "disconnected" });
     expect(f).toHaveBeenCalledTimes(3);
+  });
+
+  it("reports products null when the account has no product map", async () => {
+    const { ctx } = ctxCapturing([
+      { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
+      { body: { object: "UserProfile", id: "me1" } },
+      { body: { object: "InmailCredits", credits: { classic: 5 } } },
+    ]);
+    expect((await whoami.run(ctx, {})).products).toBeNull();
   });
 
   it("still throws on non-UnipileApiError failures of credits call", async () => {

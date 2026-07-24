@@ -11,7 +11,7 @@ All commands print human-readable output on a TTY and JSON when piped (or with `
 
     linkedin whoami show
 
-Shows the connected account, your profile, and InMail credits. If it errors: missing UNIPILE_API_KEY, or the account needs reconnecting in the Unipile dashboard.
+Shows the connected account, which LinkedIn products it has (`products`: classic / sales_navigator / recruiter with connection state), your profile, and InMail credits. Check `products` before using Sales Navigator/Recruiter-specific features. If it errors: missing UNIPILE_API_KEY, or the account needs reconnecting in the Unipile dashboard.
 
 ## Inbox & messaging
 

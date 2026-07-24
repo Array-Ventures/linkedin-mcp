@@ -6,13 +6,14 @@ export const whoami = defineOperation({
   name: "linkedin_whoami",
   title: "Show connected account",
   description:
-    "Show the connected LinkedIn account (id, status), the owner's own profile, and remaining InMail credits (null when the account has no InMail products). Cheap read — use it to verify connectivity.",
+    "Show the connected LinkedIn account (id, status), which LinkedIn products are connected (products: e.g. classic / sales_navigator / recruiter with their connection state), the owner's own profile, and remaining InMail credits (null when the account has no InMail products). Cheap read — use it to verify connectivity and product access.",
   mutates: false,
   inputShape: {},
   outputShape: {
     account: z.record(z.unknown()),
     profile: z.record(z.unknown()),
     inmail_credits: z.record(z.unknown()).nullable(),
+    products: z.record(z.string()).nullable(),
   },
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   cli: { group: "whoami", command: "show" },
@@ -31,6 +32,10 @@ export const whoami = defineOperation({
         err.status === 400 && /does not support linkedin/i.test(`${err.title} ${err.detail ?? ""}`);
       if (!noProducts && !providerUnsupported) throw err;
     }
-    return { account, profile, inmail_credits: credits };
+    const products =
+      ((account.metadata as Record<string, unknown> | undefined)?.products_connection_status as
+        | Record<string, string>
+        | undefined) ?? null;
+    return { account, profile, inmail_credits: credits, products };
   },
 });
