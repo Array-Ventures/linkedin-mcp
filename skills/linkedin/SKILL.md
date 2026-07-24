@@ -1,6 +1,6 @@
 ---
 name: linkedin
-description: Operate LinkedIn (messages, InMail, invitations, profiles, posts, search) through the `linkedin` CLI backed by Unipile. Use for LinkedIn outreach, inbox triage, sourcing/searching people or companies, posting, and engagement. Requires UNIPILE_API_KEY.
+description: Operate LinkedIn (messages, InMail, invitations, profiles, posts, comments, reactions, search) through the `linkedin` CLI backed by Unipile. Use for LinkedIn outreach, inbox triage, sourcing/searching people or companies, posting, engagement analysis, and managing your own content and connections. Requires UNIPILE_API_KEY.
 ---
 
 # LinkedIn CLI
@@ -20,11 +20,27 @@ Shows the connected account, which LinkedIn products it has (`products`: classic
     linkedin chats list --inbox CLASSIC_ARCHIVED     # other inboxes: CLASSIC_SPAM, CLASSIC_JOBS, Sales Nav/Recruiter variants
 
 LinkedIn cannot filter by unread server-side — check each chat's `unread_count` in the JSON (0 = read, >0 = unread, -1 = manually marked unread) and follow `next_cursor` if you need more.
+
     linkedin messages list --chat-id <id>
+    linkedin messages get --chat-id <id> --message-id <id>
     linkedin messages send --chat-id <id> --text "..."     # existing conversation
     linkedin chats start --user-id <id> --text "..."       # NEW conversation (outreach!)
     linkedin chats start --user-id <id> --text "..." --inmail   # InMail (needs credits)
-    linkedin chats read --chat-id <id>
+    linkedin chats read --chat-id <id>                     # marks the whole chat read
+
+Messaging someone who sent you a PENDING invitation needs the invitation id:
+
+    linkedin chats start --user-id <id> --text "..." --relation-request-id <id>
+
+Managing sent messages (your own only) and threads:
+
+    linkedin messages edit --chat-id <id> --message-id <id> --text "..."
+    linkedin messages delete --chat-id <id> --message-id <id>
+    linkedin messages forward --chat-id <id> --message-id <id> --destination-chat-id <id>
+    linkedin messages read --chat-id <id> --message-id <id>   # one message, does NOT clear chat unread_count
+    linkedin react message --chat-id <id> --message-id <id> --reaction "👍" --action add   # emoji, not the linkedin_* enum
+    linkedin participants list --chat-id <id>                 # group chats only; fails on 1-to-1
+    linkedin participants manage --chat-id <id> --user-id <id> --action add|remove
 
 ## People & network
 
@@ -36,6 +52,9 @@ LinkedIn cannot filter by unread server-side — check each chat's `unread_count
     linkedin invitations send --user-id <id> --message "..."
     linkedin invitations respond --request-id <id> --action accept|decline|withdraw
     linkedin follow set --user-id <id> --action follow|unfollow
+    linkedin followers list --direction followers|following [--user <id>]
+    linkedin connections remove --user-id <id>    # IRREVERSIBLE — removes a 1st-degree connection
+    linkedin profile update --headline "..." --bio "..."   # name/headline/bio/location only; re-fetch to confirm
 
 ## Posts
 
@@ -44,7 +63,21 @@ LinkedIn cannot filter by unread server-side — check each chat's `unread_count
     linkedin posts create --text "..."        # PUBLIC content — confirm wording first
     linkedin comments list --post-id <id>
     linkedin comments add --post-id <id> --text "..." [--reply-to <comment-id>]
-    linkedin react set --post-id <id> --reaction linkedin_like --action add
+    linkedin react set --target post --post-id <id> --reaction linkedin_like --action add
+    linkedin react set --target comment --post-id <id> --comment-id <id> --reaction linkedin_celebrate --action add
+    linkedin react list --target post|comment|message ...   # WHO reacted
+
+Editing/removing your own content (own posts and comments only):
+
+    linkedin posts edit --post-id <id> --text "..."     # only text + --can-comment are editable
+    linkedin posts delete --post-id <id>                # IRREVERSIBLE
+    linkedin comments edit --post-id <id> --comment-id <id> --text "..."
+    linkedin comments delete --post-id <id> --comment-id <id>   # IRREVERSIBLE
+
+Seeing what someone engages with (each item carries the `parent_post`):
+
+    linkedin engagement comments --user <id>     # comments they've written
+    linkedin engagement reactions --user <id>    # posts they've reacted to
 
 ## Search (classic)
 
@@ -55,7 +88,11 @@ Filters take parameter IDS — resolve names first:
     linkedin search run companies --keywords "devtools"
     linkedin search run posts --keywords "agents" --posted-within PAST_WEEK
 
-Search paginates by --offset (max 50/page). Sales Navigator search is not wrapped; use `linkedin raw` if you must.
+Or skip the filter-id dance entirely by pasting a LinkedIn search URL from the browser:
+
+    linkedin search run --url "https://www.linkedin.com/search/results/people/?keywords=..."
+
+URL mode takes no category or filters (they're encoded in the URL), allows --limit up to 100, and can return people, companies, jobs, or posts depending on the URL. Category mode paginates by --offset at max 50/page. Sales Navigator and Recruiter search are not wrapped; use `linkedin raw` if you must.
 
 ## Escape hatch
 
@@ -69,3 +106,6 @@ Search paginates by --offset (max 50/page). Sales Navigator search is not wrappe
 - Unipile enforces LinkedIn's limits server-side (≈80-100 invitations/day, ≈100-150 messages/day, ≈1000 search profiles/day). On 429 errors: STOP that action type — the error says whether it's a Unipile limit or a LinkedIn quota and when to retry. Never retry a failed write automatically.
 - Space consecutive write actions by at least ~60 seconds and randomize timing; burst-writing looks like automation and risks account restriction.
 - Bulk outreach: draft first, get human sign-off, then send slowly.
+- IRREVERSIBLE actions — `connections remove`, `posts delete`, `comments delete`, `messages delete`: confirm with the human before running. Removing a connection cannot be undone without a fresh invitation (which burns invite quota).
+- `profile update` does not echo what LinkedIn stored — re-run `linkedin profile get me` afterwards to verify.
+- Every result carries a `rate` field (live remaining budget from Unipile). It is a ceiling, never a target: if it warns, stop that action type until the window resets.

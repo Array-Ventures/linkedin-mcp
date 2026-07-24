@@ -68,7 +68,14 @@ export function flagSpec(schema: z.ZodTypeAny): FlagSpec {
 function addOpCommand(group: Command, op: OperationDef, deps: CliDeps): void {
   const cmd = group.command(op.cli.command).description(op.description);
   const positional = op.cli.positional;
-  if (positional !== undefined) cmd.argument(`<${kebab(positional)}>`, (op.inputShape[positional] as z.ZodTypeAny).description ?? positional);
+  if (positional !== undefined) {
+    // An optional zod field must stay optional on the command line too — e.g. `search run`
+    // takes a category OR a --url, so demanding the positional would make url mode unreachable.
+    const schema = op.inputShape[positional] as z.ZodTypeAny;
+    const required = flagSpec(schema).required;
+    const name = kebab(positional);
+    cmd.argument(required ? `<${name}>` : `[${name}]`, schema.description ?? positional);
+  }
 
   for (const [key, schema] of Object.entries(op.inputShape)) {
     if (key === positional) continue;

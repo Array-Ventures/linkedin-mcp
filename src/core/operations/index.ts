@@ -14,8 +14,18 @@ import {
   sendMessage,
   startChat,
 } from "./messaging.js";
-import { followUser, getCompany, getProfile, listConnections, listInvitations, respondInvitation, sendInvitation } from "./network.js";
+import {
+  followUser,
+  getCompany,
+  getProfile,
+  listConnections,
+  listInvitations,
+  removeConnection,
+  respondInvitation,
+  sendInvitation,
+} from "./network.js";
 import { addComment, createPost, getPost, listComments, listPosts } from "./posts.js";
+import { deleteComment, deletePost, editComment, editPost, updateProfile } from "./content.js";
 import {
   linkedinReact,
   linkedinReactToMessage,
@@ -34,8 +44,11 @@ export const operations: OperationDef[] = [
   listParticipants, manageParticipants,
   // network
   getProfile, getCompany, listConnections, listInvitations, sendInvitation, respondInvitation, followUser,
+  removeConnection,
   // posts
   listPosts, getPost, createPost, listComments, addComment,
+  // editing own content
+  editPost, deletePost, editComment, deleteComment, updateProfile,
   // engagement
   linkedinReact, linkedinReactToMessage, listReactions, listUserComments, listUserReactions, listFollowers,
   // search + meta
