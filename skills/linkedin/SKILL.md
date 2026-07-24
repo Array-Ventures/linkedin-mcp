@@ -9,7 +9,8 @@ All commands print human-readable output on a TTY and JSON when piped (or with `
 
 ## Setup check
 
-    linkedin whoami show
+    linkedin whoami show                                      # 1 request: account + connected products
+    linkedin whoami show --include inboxes --include profile  # extras cost 1 request each
 
 Shows the connected account, which LinkedIn products it has (`products`: classic / sales_navigator / recruiter with connection state), your profile, and InMail credits. Check `products` before using Sales Navigator/Recruiter-specific features. If it errors: missing UNIPILE_API_KEY, or the account needs reconnecting in the Unipile dashboard.
 

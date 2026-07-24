@@ -70,7 +70,7 @@ All commands output human-readable text on a TTY and JSON when piped or with `--
 ### 1. Check Setup
 
 ```bash
-linkedin whoami show
+linkedin whoami show   # 1 cheap request: account + products. Add --include inboxes|profile|inmail_credits for extras.
 ```
 
 Shows your connected account, profile, and InMail credits. If this fails, verify `UNIPILE_API_KEY` and check the Unipile dashboard.

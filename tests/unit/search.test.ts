@@ -80,37 +80,54 @@ describe("search ops", () => {
 });
 
 describe("whoami", () => {
-  it("aggregates account + profile, lifts connected products, tolerates missing inmail credits", async () => {
+  const ACCOUNT = {
+    body: {
+      object: "Account", id: "acc_1", provider: "linkedin", status: "running",
+      metadata: { products_connection_status: { classic: "running", sales_navigator: "disconnected" } },
+    },
+  };
+
+  it("costs ONE request by default and returns account + products", async () => {
+    const { ctx, f } = ctxCapturing([ACCOUNT]);
+    const out = await whoami.run(ctx, {});
+    expect(f).toHaveBeenCalledTimes(1);
+    expect(call(f).url).toBe("https://api.unipile.com/v2/accounts/acc_1");
+    expect(out.account).toMatchObject({ id: "acc_1" });
+    expect(out.products).toEqual({ classic: "running", sales_navigator: "disconnected" });
+    expect(out.profile).toBeUndefined();
+    expect(out.inboxes).toBeUndefined();
+    expect(out.inmail_credits).toBeUndefined();
+  });
+
+  it("fetches only the requested extras", async () => {
     const { ctx, f } = ctxCapturing([
-      {
-        body: {
-          object: "Account", id: "acc_1", provider: "linkedin", status: "running",
-          metadata: { products_connection_status: { classic: "running", sales_navigator: "disconnected" } },
-        },
-      },
-      { body: { object: "UserProfile", id: "me1" } },
-      { status: 403, body: { type: "errors/insufficient_permissions", title: "No InMail" } },
+      ACCOUNT,
       { body: { data: [{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }] } },
     ]);
-    const out = await whoami.run(ctx, {});
-    expect(out.account).toMatchObject({ id: "acc_1" });
+    const out = await whoami.run(ctx, { include: ["inboxes"] });
+    expect(f).toHaveBeenCalledTimes(2);
+    expect(out.inboxes).toEqual([{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }]);
+    expect(out.profile).toBeUndefined();
+  });
+
+  it("fetches profile and credits when asked, tolerating missing InMail products", async () => {
+    const { ctx, f } = ctxCapturing([
+      ACCOUNT,
+      { body: { object: "UserProfile", id: "me1" } },
+      { status: 403, body: { type: "errors/insufficient_permissions", title: "No InMail" } },
+    ]);
+    const out = await whoami.run(ctx, { include: ["profile", "inmail_credits"] });
+    expect(f).toHaveBeenCalledTimes(3);
     expect(out.profile).toMatchObject({ id: "me1" });
     expect(out.inmail_credits).toBeNull();
-    expect(out.products).toEqual({ classic: "running", sales_navigator: "disconnected" });
-    expect(out.inboxes).toEqual([{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }]);
-    expect(f).toHaveBeenCalledTimes(4);
   });
 
   it("reports products null when the account has no product map", async () => {
-    const { ctx } = ctxCapturing([
-      { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
-      { body: { object: "UserProfile", id: "me1" } },
-      { body: { object: "InmailCredits", credits: { classic: 5 } } },
-    ]);
+    const { ctx } = ctxCapturing([{ body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } }]);
     expect((await whoami.run(ctx, {})).products).toBeNull();
   });
 
-  it("still throws on non-UnipileApiError failures of credits call", async () => {
+  it("still throws on non-UnipileApiError failures", async () => {
     const bad = { ctx: { client: { request: vi.fn().mockRejectedValue(new TypeError("boom")) } as never, accountId: "a" } };
     await expect(whoami.run(bad.ctx as never, {})).rejects.toThrow(TypeError);
   });
@@ -118,28 +135,24 @@ describe("whoami", () => {
   it("tolerates the provider-capability 400 from non-LinkedIn-capable accounts", async () => {
     const { ctx } = ctxCapturing([
       { body: { object: "Account", id: "acc_1", provider: "mock", status: "running" } },
-      { body: { object: "UserProfile", id: "me1" } },
       { status: 400, body: { type: "api/invalid_parameters", title: "Account provider does not support linkedin specific methods" } },
     ]);
-    const out = await whoami.run(ctx, {});
-    expect(out.inmail_credits).toBeNull();
+    expect((await whoami.run(ctx, { include: ["inmail_credits"] })).inmail_credits).toBeNull();
   });
 
   it("does NOT swallow rate-limit failures of the credits call", async () => {
     const { ctx } = ctxCapturing([
       { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
-      { body: { object: "UserProfile", id: "me1" } },
       { status: 429, body: { type: "api/too_many_requests", title: "Too many" } },
     ]);
-    await expect(whoami.run(ctx, {})).rejects.toThrow(UnipileApiError);
+    await expect(whoami.run(ctx, { include: ["inmail_credits"] })).rejects.toThrow(UnipileApiError);
   });
 
   it("tolerates 404 from inmail credits", async () => {
     const { ctx } = ctxCapturing([
       { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
-      { body: { object: "UserProfile", id: "me1" } },
       { status: 404, body: { type: "errors/not_found", title: "Not found" } },
     ]);
-    expect((await whoami.run(ctx, {})).inmail_credits).toBeNull();
+    expect((await whoami.run(ctx, { include: ["inmail_credits"] })).inmail_credits).toBeNull();
   });
 });

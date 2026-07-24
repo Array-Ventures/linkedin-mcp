@@ -22,7 +22,7 @@ const rateOutputField = z
   .optional();
 
 const INSTRUCTIONS = `LinkedIn tools acting AS THE ACCOUNT OWNER via Unipile. Workflow:
-1. Run linkedin_whoami first — it returns the connected account, products (classic/sales_navigator/recruiter — gates which features work), available message inboxes, your profile, and InMail credits.
+1. Run linkedin_whoami first — one cheap request returning the connected account and its products (classic/sales_navigator/recruiter), which gate what the other tools can do. Extras (inboxes, profile, inmail_credits) each cost another request via include — ask for them only when needed.
 2. IDs flow between tools: linkedin_search → user ids → linkedin_get_profile / linkedin_start_chat; linkedin_list_chats → chat ids → linkedin_list_messages / linkedin_send_message; linkedin_list_invitations → request ids → linkedin_respond_invitation. Resolve search filter ids with linkedin_get_search_parameters before filtering.
 3. Safety (protects the user's real LinkedIn account): every send/invite/post/comment/react is user-visible — treat text as final copy. Space write actions ~60s apart. On a 429 error, STOP that action type; the message says whether it is a Unipile or LinkedIn quota and when to retry. Never retry a failed write.
    Results may include a "rate" field (live remaining budget from Unipile's counters). It is a ceiling, NEVER a target: if it carries a warning, stop that action type until the window resets.
