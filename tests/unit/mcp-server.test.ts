@@ -43,6 +43,32 @@ describe("MCP server", () => {
     expect((res.content as Array<{ type: string; text: string }>)[0]!.text).toContain('"c1"');
   });
 
+  it("attaches the live rate window to results when Unipile sends x-ratelimit headers", async () => {
+    let i = 0;
+    const f = vi.fn(async () => {
+      const bodies = [
+        { data: [{ object: "Inbox", id: "CLASSIC_PRIMARY", disabled: false }] },
+        { data: [{ id: "c1" }] },
+      ];
+      return new Response(JSON.stringify(bodies[Math.min(i++, 1)]), {
+        status: 200,
+        headers: { "x-ratelimit-limit": "100", "x-ratelimit-remaining": "4" },
+      });
+    });
+    const server = buildServer({
+      client: new UnipileClient({ apiKey: "k", fetchImpl: f as unknown as typeof fetch }),
+      defaultAccountId: "acc_1",
+    });
+    const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+    const mcp = new Client({ name: "test", version: "0.0.0" });
+    await Promise.all([server.connect(serverT), mcp.connect(clientT)]);
+    const res = await mcp.callTool({ name: "linkedin_list_chats", arguments: {} });
+    expect(res.isError).toBeFalsy();
+    const sc = res.structuredContent as Record<string, unknown>;
+    expect(sc.rate).toMatchObject({ limit: 100, remaining: 4 });
+    expect((sc.rate as Record<string, unknown>).warning).toMatch(/Stop this action type/);
+  });
+
   it("returns isError tool results (not protocol errors) for API failures", async () => {
     const { mcp } = await connect([
       { status: 429, body: { type: "provider/too_many_requests", title: "Too many", req_id: "r1" } },

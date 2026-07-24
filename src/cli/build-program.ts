@@ -5,6 +5,7 @@ import { resolveAccountId } from "../core/accounts.js";
 import { operations } from "../core/operations/index.js";
 import type { OperationDef } from "../core/operations/types.js";
 import { UsageError, errorToText } from "../core/errors.js";
+import { rateInfo } from "../core/rate.js";
 import { renderHuman } from "./output.js";
 
 export class CliError extends Error {
@@ -106,7 +107,10 @@ function addOpCommand(group: Command, op: OperationDef, deps: CliDeps): void {
       const parsed = z.object(op.inputShape).parse(input);
       const accountId = await resolveAccountId(deps.client, (opts.account as string | undefined) ?? deps.defaultAccountId);
       const result = await op.run({ client: deps.client, accountId }, parsed);
-      deps.writeOut(json ? JSON.stringify(result) : renderHuman(result));
+      const rate = rateInfo(deps.client);
+      const payload = rate === undefined ? result : { ...result, rate };
+      deps.writeOut(json ? JSON.stringify(payload) : renderHuman(result));
+      if (typeof rate?.warning === "string") deps.writeErr(`WARNING: ${rate.warning}`);
     } catch (err) {
       const message = err instanceof z.ZodError
         ? `Invalid input: ${err.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`

@@ -17,8 +17,18 @@ export interface UnipileClientOptions {
 
 export const DEFAULT_BASE_URL = "https://api.unipile.com";
 
+/** Last-seen x-ratelimit-* headers — Unipile's authoritative counters, read fresh off every response. */
+export interface RateLimitSnapshot {
+  limit: number;
+  remaining: number;
+  reset?: string;
+  path: string;
+}
+
 export class UnipileClient {
   readonly baseUrl: string;
+  /** Updated on every response (including 429s) that carries x-ratelimit-* headers. */
+  lastRateLimit: RateLimitSnapshot | undefined;
   private readonly apiKey: string;
   private readonly fetchImpl: typeof fetch;
   private readonly timeoutMs: number;
@@ -68,6 +78,16 @@ export class UnipileClient {
       body,
       signal: AbortSignal.timeout(this.timeoutMs),
     });
+    const limitHeader = res.headers.get("x-ratelimit-limit");
+    const remainingHeader = res.headers.get("x-ratelimit-remaining");
+    if (limitHeader !== null && remainingHeader !== null && /^\d+$/.test(limitHeader) && /^\d+$/.test(remainingHeader)) {
+      this.lastRateLimit = {
+        limit: Number(limitHeader),
+        remaining: Number(remainingHeader),
+        reset: res.headers.get("x-ratelimit-reset") ?? undefined,
+        path: spec.path,
+      };
+    }
     if (!res.ok) throw await toApiError(res);
     if (res.status === 204) return undefined as T;
     return (await res.json()) as T;
