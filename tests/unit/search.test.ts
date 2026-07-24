@@ -62,4 +62,23 @@ describe("whoami", () => {
     const bad = { ctx: { client: { request: vi.fn().mockRejectedValue(new TypeError("boom")) } as never, accountId: "a" } };
     await expect(whoami.run(bad.ctx as never, {})).rejects.toThrow(TypeError);
   });
+
+  it("tolerates the provider-capability 400 from non-LinkedIn-capable accounts", async () => {
+    const { ctx } = ctxCapturing([
+      { body: { object: "Account", id: "acc_1", provider: "mock", status: "running" } },
+      { body: { object: "UserProfile", id: "me1" } },
+      { status: 400, body: { type: "api/invalid_parameters", title: "Account provider does not support linkedin specific methods" } },
+    ]);
+    const out = await whoami.run(ctx, {});
+    expect(out.inmail_credits).toBeNull();
+  });
+
+  it("does NOT swallow rate-limit failures of the credits call", async () => {
+    const { ctx } = ctxCapturing([
+      { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
+      { body: { object: "UserProfile", id: "me1" } },
+      { status: 429, body: { type: "api/too_many_requests", title: "Too many" } },
+    ]);
+    await expect(whoami.run(ctx, {})).rejects.toThrow(UnipileApiError);
+  });
 });

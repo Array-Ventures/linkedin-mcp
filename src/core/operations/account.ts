@@ -23,8 +23,13 @@ export const whoami = defineOperation({
     try {
       credits = await client.request<Record<string, unknown>>({ method: "GET", path: `/v2/${accountId}/linkedin/inmail-credits` });
     } catch (err) {
-      // Only 403/404 mean "no InMail products on this plan" — anything else (401/429/5xx) is a real failure.
-      if (!(err instanceof UnipileApiError) || (err.status !== 403 && err.status !== 404)) throw err;
+      // Suppress only "credits don't exist here": 403/404 (no InMail products on this plan) and the
+      // provider-capability 400 some accounts return. Anything else (401/429/5xx) is a real failure.
+      if (!(err instanceof UnipileApiError)) throw err;
+      const noProducts = err.status === 403 || err.status === 404;
+      const providerUnsupported =
+        err.status === 400 && /does not support linkedin/i.test(`${err.title} ${err.detail ?? ""}`);
+      if (!noProducts && !providerUnsupported) throw err;
     }
     return { account, profile, inmail_credits: credits };
   },
