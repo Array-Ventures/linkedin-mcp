@@ -75,6 +75,23 @@ describe("messaging ops", () => {
     expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages?cursor=x");
   });
 
+  it("startChat sends relation_request_id in classic specifics (required when replying to a pending invite)", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "ChatStarted", chat_id: "c4", message_id: "m1" }]);
+    await startChat.run(ctx, { user_id: "u1", text: "hi", relation_request_id: "rr_9" });
+    expect(call(f).body.specifics).toEqual({ linkedin: { classic: { relation_request_id: "rr_9" } } });
+    const withInmail = ctxCapturing([{ object: "ChatStarted", chat_id: "c5", message_id: null }]);
+    await startChat.run(withInmail.ctx, { user_id: "u1", text: "hi", inmail: true, relation_request_id: "rr_9" });
+    expect(call(withInmail.f).body.specifics).toEqual({ linkedin: { classic: { inmail: true, relation_request_id: "rr_9" } } });
+  });
+
+  it("startChat rejects relation_request_id with a Sales Navigator subject", async () => {
+    const { ctx, f } = ctxCapturing([{}]);
+    await expect(
+      startChat.run(ctx, { user_id: "u1", text: "x", subject: "Intro", relation_request_id: "rr_9" })
+    ).rejects.toThrow(/classic/);
+    expect(f).not.toHaveBeenCalled();
+  });
+
   it("startChat rejects inmail+subject combination", async () => {
     const { ctx, f } = ctxCapturing([{ }]);
     await expect(startChat.run(ctx, { user_id: "u1", text: "x", inmail: true, subject: "Intro" })).rejects.toThrow(/not both/);

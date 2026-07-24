@@ -22,6 +22,12 @@ describe("network ops", () => {
     expect(out).toEqual({ item: { object: "UserProfile", id: "u1" } });
   });
 
+  it("getProfile forwards the variant query param", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "UserProfile", id: "u1" }]);
+    await getProfile.run(ctx, { user: "u1", variant: "linkedin_sales_navigator" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/users/u1?variant=linkedin_sales_navigator");
+  });
+
   it("getCompany hits the linkedin company path", async () => {
     const { ctx, f } = ctxCapturing([{ object: "CompanyProfile", id: "co1" }]);
     await getCompany.run(ctx, { company: "co1" });

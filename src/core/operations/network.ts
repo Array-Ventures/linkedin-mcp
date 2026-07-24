@@ -27,6 +27,10 @@ export const getProfile = defineOperation({
   inputShape: {
     user: z.string().min(1).describe("User provider id, public identifier, or 'me'"),
     sections: z.array(z.enum(PROFILE_SECTIONS)).optional().describe("Profile sections to include, e.g. linkedin_experience"),
+    variant: z
+      .enum(["linkedin_classic", "linkedin_recruiter", "linkedin_sales_navigator"])
+      .optional()
+      .describe("Which LinkedIn product's profile view to fetch (default classic)"),
   },
   outputShape: itemOutputShape,
   annotations: READ,
@@ -35,7 +39,7 @@ export const getProfile = defineOperation({
     item: await client.request<Record<string, unknown>>({
       method: "GET",
       path: `/v2/${accountId}/users/${encodeURIComponent(input.user as string)}`,
-      query: { with_sections: input.sections as string[] | undefined },
+      query: { with_sections: input.sections as string[] | undefined, variant: input.variant as string | undefined },
     }),
   }),
 });

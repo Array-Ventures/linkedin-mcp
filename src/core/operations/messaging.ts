@@ -116,6 +116,11 @@ export const startChat = defineOperation({
     text: z.string().min(1).describe("First message text (plain text)"),
     inmail: z.boolean().optional().describe("Send as classic InMail instead of a normal message"),
     subject: z.string().optional().describe("Sales Navigator InMail subject (implies Sales Navigator sending). Cannot be combined with inmail."),
+    relation_request_id: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("REQUIRED when messaging a user who sent you a pending connection request — the invitation id from linkedin_list_invitations (direction=received)"),
   },
   outputShape: { chat_id: z.string(), message_ids: z.array(z.string()) },
   annotations: WRITE,
@@ -124,11 +129,17 @@ export const startChat = defineOperation({
     if (input.subject !== undefined && input.inmail === true) {
       throw new UsageError("Pass either inmail (classic InMail) or subject (Sales Navigator InMail), not both.");
     }
+    if (input.subject !== undefined && input.relation_request_id !== undefined) {
+      throw new UsageError("relation_request_id applies to classic messages and cannot be combined with a Sales Navigator subject.");
+    }
     const body: Record<string, unknown> = { text: input.text, users_ids: input.user_id };
     if (input.subject !== undefined) {
       body.specifics = { linkedin: { sales_navigator: { subject: input.subject } } };
-    } else if (input.inmail === true) {
-      body.specifics = { linkedin: { classic: { inmail: true } } };
+    } else {
+      const classic: Record<string, unknown> = {};
+      if (input.inmail === true) classic.inmail = true;
+      if (input.relation_request_id !== undefined) classic.relation_request_id = input.relation_request_id;
+      if (Object.keys(classic).length > 0) body.specifics = { linkedin: { classic } };
     }
     const res = await client.request<{ chat_id: string; message_id: string | string[] | null }>({
       method: "POST",
