@@ -78,7 +78,7 @@ Shows your connected account, profile, and InMail credits. If this fails, verify
 ### 2. List Unread Messages
 
 ```bash
-linkedin chats list --unread --limit 10
+linkedin chats list --unread --limit 10   # CLASSIC_PRIMARY inbox; use --inbox for CLASSIC_ARCHIVED / CLASSIC_SPAM / CLASSIC_JOBS etc.
 ```
 
 Fetch your 10 most recent unread conversations. Use `--json` to get structured output for parsing.

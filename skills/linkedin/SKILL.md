@@ -15,7 +15,8 @@ Shows the connected account, your profile, and InMail credits. If it errors: mis
 
 ## Inbox & messaging
 
-    linkedin chats list --unread --limit 10
+    linkedin chats list --unread --limit 10          # CLASSIC_PRIMARY inbox by default
+    linkedin chats list --inbox CLASSIC_ARCHIVED     # other inboxes: CLASSIC_SPAM, CLASSIC_JOBS, Sales Nav/Recruiter variants
     linkedin messages list --chat-id <id>
     linkedin messages send --chat-id <id> --text "..."     # existing conversation
     linkedin chats start --user-id <id> --text "..."       # NEW conversation (outreach!)

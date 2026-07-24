@@ -10,9 +10,17 @@ export const listChats = defineOperation({
   name: "linkedin_list_chats",
   title: "List LinkedIn chats",
   description:
-    "List LinkedIn conversations, most recent first. Set unread=true to only see chats with unread messages. Returned chat ids feed linkedin_list_messages / linkedin_send_message.",
+    "List LinkedIn conversations from one inbox, most recent first (LinkedIn requires inbox-scoped listing). Default inbox CLASSIC_PRIMARY; others: CLASSIC_ARCHIVED, CLASSIC_SPAM, CLASSIC_JOBS, plus Sales Navigator/Recruiter inboxes when subscribed. Set unread=true to only see chats with unread messages. Returned chat ids feed linkedin_list_messages / linkedin_send_message.",
   mutates: false,
-  inputShape: { unread: z.boolean().optional().describe("Only chats with unread messages"), ...cursorPagination },
+  inputShape: {
+    inbox: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("Inbox id (default CLASSIC_PRIMARY). Known: CLASSIC_PRIMARY, CLASSIC_ARCHIVED, CLASSIC_SPAM, CLASSIC_JOBS; Sales Navigator/Recruiter accounts expose more via GET /inboxes"),
+    unread: z.boolean().optional().describe("Only chats with unread messages"),
+    ...cursorPagination,
+  },
   outputShape: pageOutputShape,
   annotations: READ,
   cli: { group: "chats", command: "list" },
@@ -20,7 +28,7 @@ export const listChats = defineOperation({
     toPage(
       await client.request<ListEnvelope>({
         method: "GET",
-        path: `/v2/${accountId}/chats`,
+        path: `/v2/${accountId}/inboxes/${encodeURIComponent((input.inbox as string | undefined) ?? "CLASSIC_PRIMARY")}/chats`,
         query: { is_unread: input.unread as boolean | undefined, limit: input.limit as number | undefined, cursor: input.cursor as string | undefined },
       })
     ),

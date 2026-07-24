@@ -14,12 +14,18 @@ const call = (f: ReturnType<typeof vi.fn>, n = 0) => {
 };
 
 describe("messaging ops", () => {
-  it("listChats maps unread filter and pagination", async () => {
+  it("listChats reads from CLASSIC_PRIMARY inbox by default (LinkedIn 501s the generic /chats route)", async () => {
     const { ctx, f } = ctxCapturing([{ data: [{ id: "c1" }], next_cursor: "n1" }]);
     const out = await listChats.run(ctx, { unread: true, limit: 5 });
     expect(call(f)).toMatchObject({ method: "GET" });
-    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats?is_unread=true&limit=5");
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/inboxes/CLASSIC_PRIMARY/chats?is_unread=true&limit=5");
     expect(out).toEqual({ items: [{ id: "c1" }], next_cursor: "n1" });
+  });
+
+  it("listChats accepts an explicit inbox id", async () => {
+    const { ctx, f } = ctxCapturing([{ data: [] }]);
+    await listChats.run(ctx, { inbox: "CLASSIC_ARCHIVED" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/inboxes/CLASSIC_ARCHIVED/chats");
   });
 
   it("getChat requires exactly one of chat_id / user_id", async () => {
