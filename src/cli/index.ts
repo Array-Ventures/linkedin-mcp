@@ -1,12 +1,24 @@
 import { CommanderError } from "commander";
-import { UnipileClient } from "../core/client.js";
+import { DEFAULT_BASE_URL, UnipileClient } from "../core/client.js";
 import { applyDotEnvLocal, loadConfig } from "../core/config.js";
+import type { Config } from "../core/config.js";
+import { ConfigError } from "../core/errors.js";
 import { buildProgram, CliError } from "./build-program.js";
 import { registerRawCommand } from "./raw.js";
 
 async function main(): Promise<void> {
   applyDotEnvLocal(process.cwd());
-  const cfg = loadConfig(process.env);
+  let cfg: Config;
+  try {
+    cfg = loadConfig(process.env);
+  } catch (err) {
+    // --help / --version (and bare `linkedin`) must work without credentials.
+    const args = process.argv.slice(2);
+    const wantsHelp =
+      args.length === 0 || args.some((a) => a === "-h" || a === "--help" || a === "-V" || a === "--version");
+    if (!(err instanceof ConfigError) || !wantsHelp) throw err;
+    cfg = { apiKey: "unused", baseUrl: DEFAULT_BASE_URL, allowCustomBase: false };
+  }
   const client = new UnipileClient({ apiKey: cfg.apiKey, baseUrl: cfg.baseUrl, allowCustomBase: cfg.allowCustomBase });
   const program = buildProgram({
     client,
