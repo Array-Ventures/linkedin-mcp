@@ -32,6 +32,10 @@ Messaging someone who sent you a PENDING invitation needs the invitation id:
 
     linkedin chats start --user-id <id> --text "..." --relation-request-id <id>
 
+Send from a specific inbox (e.g. a Sales Navigator mailbox) instead of the default route:
+
+    linkedin chats start --user-id <id> --text "..." --inbox <inbox-id>
+
 Managing sent messages (your own only) and threads:
 
     linkedin messages edit --chat-id <id> --message-id <id> --text "..."
@@ -53,7 +57,7 @@ Managing sent messages (your own only) and threads:
     linkedin invitations respond --request-id <id> --action accept|decline|withdraw
     linkedin follow set --user-id <id> --action follow|unfollow
     linkedin followers list --direction followers|following [--user <id>]
-    linkedin connections remove --user-id <id>    # IRREVERSIBLE — removes a 1st-degree connection
+    linkedin connections remove <user-id>         # IRREVERSIBLE — removes a 1st-degree connection
     linkedin profile update --headline "..." --bio "..."   # name/headline/bio/location only; re-fetch to confirm
 
 ## Posts
@@ -69,8 +73,8 @@ Managing sent messages (your own only) and threads:
 
 Editing/removing your own content (own posts and comments only):
 
-    linkedin posts edit --post-id <id> --text "..."     # only text + --can-comment are editable
-    linkedin posts delete --post-id <id>                # IRREVERSIBLE
+    linkedin posts edit <post-id> --text "..."          # only text + --can-comment are editable
+    linkedin posts delete <post-id>                     # IRREVERSIBLE
     linkedin comments edit --post-id <id> --comment-id <id> --text "..."
     linkedin comments delete --post-id <id> --comment-id <id>   # IRREVERSIBLE
 
