@@ -4,6 +4,7 @@
   "description": "LinkedIn MCP server + CLI backed by the Unipile v2 API",
   "type": "module",
   "license": "MIT",
+  "keywords": ["mcp", "model-context-protocol", "linkedin", "unipile", "cli", "agent"],
   "engines": { "node": ">=20.0.0" },
   "bin": { "linkedin-mcp": "dist/mcp/index.js", "linkedin": "dist/cli/index.js" },
   "files": ["dist", "skills"],

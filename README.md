@@ -2,6 +2,15 @@
 
 An MCP (Model Context Protocol) server and CLI for operating LinkedIn at scale through the Unipile v2 API. Automate messaging, inbox triage, outreach, profiles, posts, search, and engagement on behalf of a connected LinkedIn account.
 
+> ⚠️ **Read before using.** This tool acts as a real person on a real LinkedIn account, and
+> **LinkedIn's Terms of Service prohibit automated access**. Accounts that behave like bots get
+> restricted or banned — that risk is yours, not the maintainers'. Use it deliberately: keep
+> Unipile's rate limits at their recommended values, space write actions out, never run bulk
+> outreach unattended, and treat every message, invitation, post and comment as something a human
+> signed off on. The software is provided as-is with no warranty (see [LICENSE](LICENSE)); you are
+> responsible for how you use it and for complying with LinkedIn's terms and applicable law
+> (including data-protection rules if you store what you retrieve).
+
 ## What It Is
 
 **linkedin-mcp** exposes:
