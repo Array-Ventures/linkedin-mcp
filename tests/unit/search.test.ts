@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { UnipileClient } from "../../src/core/client.js";
 import { getSearchParameters, searchLinkedIn } from "../../src/core/operations/search.js";
 import { whoami } from "../../src/core/operations/account.js";
-import { UnipileApiError } from "../../src/core/errors.js";
+import { UnipileApiError, UsageError } from "../../src/core/errors.js";
 
 function ctxCapturing(responses: Array<{ status?: number; body: unknown }>) {
   let i = 0;
@@ -65,6 +65,45 @@ describe("search ops", () => {
     expect(call(f).url).toContain("limit=2");
     expect(call(f).url).toContain("offset=2");
     expect(out).toMatchObject({ offset: 2, next_offset: 4 });
+  });
+
+  it("requires category when url is absent, with zero network calls", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [] } }]);
+    await expect(searchLinkedIn.run(ctx, {})).rejects.toThrow(UsageError);
+    expect(f).not.toHaveBeenCalled();
+  });
+
+  it("rejects category+url together, listing the offenders, with zero network calls", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [] } }]);
+    await expect(
+      searchLinkedIn.run(ctx, { url: "https://www.linkedin.com/search/results/people/?keywords=ai", category: "people", keywords: "ai" })
+    ).rejects.toThrow(/category, keywords/);
+    expect(f).not.toHaveBeenCalled();
+  });
+
+  it("posts { url } to /linkedin/search and carries offset/next_offset", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [{ id: "a" }], total_count: 1 } }]);
+    const out = await searchLinkedIn.run(ctx, {
+      url: "https://www.linkedin.com/search/results/people/?keywords=ai",
+      limit: 20,
+      offset: 0,
+    });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/linkedin/search?limit=20&offset=0");
+    expect(call(f)).toMatchObject({ method: "POST", body: { url: "https://www.linkedin.com/search/results/people/?keywords=ai" } });
+    expect(out).toMatchObject({ items: [{ id: "a" }], offset: 0 });
+    expect(out.next_offset).toBeUndefined();
+  });
+
+  it("allows up to limit=100 on the url form (zod cap raised beyond the category max of 50)", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [] } }]);
+    await searchLinkedIn.run(ctx, { url: "https://www.linkedin.com/search/results/people/", limit: 100 });
+    expect(call(f).url).toContain("limit=100");
+  });
+
+  it("rejects limit>50 on the category path even though the schema allows up to 100", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [] } }]);
+    await expect(searchLinkedIn.run(ctx, { category: "people", limit: 75 })).rejects.toThrow(UsageError);
+    expect(f).not.toHaveBeenCalled();
   });
 
   it("omits next_offset on the terminal page and forwards offsets in params search", async () => {

@@ -167,3 +167,22 @@ export const followUser = defineOperation({
     }),
   }),
 });
+
+export const removeConnection = defineOperation({
+  name: "linkedin_remove_connection",
+  title: "Remove a connection",
+  description:
+    "Permanently remove a 1st-degree connection — LinkedIn's 'Remove Connection' action. Irreversible: reconnecting requires sending (and having accepted) a brand-new invitation via linkedin_send_invitation. This deletes a bi-directional relation; for one-way follows (no mutual connection), use linkedin_follow_user with action=unfollow instead.",
+  mutates: true,
+  inputShape: { user_id: z.string().min(1).describe("Provider id of the connection to remove") },
+  outputShape: { removed: z.boolean() },
+  annotations: WRITE,
+  cli: { group: "connections", command: "remove", positional: "user_id" },
+  run: async ({ client, accountId }, input) => {
+    await client.request<void>({
+      method: "DELETE",
+      path: `/v2/${accountId}/users/me/relations/${encodeURIComponent(input.user_id as string)}`,
+    });
+    return { removed: true };
+  },
+});

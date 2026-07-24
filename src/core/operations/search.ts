@@ -11,14 +11,25 @@ export const PARAMETER_TYPES = [
   "JOB_FUNCTION", "JOB_TITLE", "EMPLOYMENT_TYPE", "SKILL",
 ] as const;
 
+/**
+ * Fields that only make sense on the category (people/companies/posts) search path. None of
+ * them are meaningful alongside a raw `url` — the URL alone fully encodes the search, and the
+ * dedicated category endpoint (`/linkedin/search/{category}`) is not the one called in that mode.
+ */
+const CATEGORY_ONLY_FIELDS = [
+  "category", "keywords", "network_distance", "location", "industry", "current_company",
+  "first_name", "last_name", "title", "sort", "posted_within",
+] as const;
+
 export const searchLinkedIn = defineOperation({
   name: "linkedin_search",
   title: "Search LinkedIn (classic)",
   description:
-    "Classic LinkedIn search for people, companies, or posts. Filter fields like location/industry/current_company take parameter IDS — resolve names to ids first with linkedin_get_search_parameters. People-only filters: network_distance, location, industry, current_company, first_name, last_name, title. Posts-only: sort, posted_within. Results are paginated by offset (max 50 per page; LinkedIn caps total results ~1000/day). Sales Navigator search is not wrapped yet — use the CLI raw command if needed.",
+    "Classic LinkedIn search for people, companies, or posts — either by category (default) or by pasting a LinkedIn Classic search URL copied from the browser via url. Exactly one of category or url is required; when url is given, category and every category-only filter must be omitted, since the URL alone encodes the search. The url form routes across all four LinkedIn Classic search verticals (people, companies, jobs, or posts) depending on what the URL encodes — Unipile's spec does not document which exact URL shapes are accepted, so treat that as unverified until tried against a real URL. Filter fields like location/industry/current_company take parameter IDS — resolve names to ids first with linkedin_get_search_parameters. People-only filters: network_distance, location, industry, current_company, first_name, last_name, title. Posts-only: sort, posted_within. Results are paginated by offset (category endpoints cap at 50/page; the url form allows up to 100/page; LinkedIn caps total results ~1000/day). Sales Navigator search is not wrapped yet — use the CLI raw command if needed.",
   mutates: false,
   inputShape: {
-    category: z.enum(["people", "companies", "posts"]).describe("What to search for"),
+    category: z.enum(["people", "companies", "posts"]).optional().describe("What to search for (required unless url is given)"),
+    url: z.string().min(1).optional().describe("A LinkedIn Classic search URL copied from the browser — cannot be combined with category or any category filter"),
     keywords: z.string().optional().describe("Free-text keywords"),
     network_distance: z.array(z.number().int().min(1).max(3)).optional().describe("People: 1=1st, 2=2nd, 3=3rd+ degree"),
     location: z.array(z.string()).optional().describe("People/companies: LOCATION parameter ids"),
@@ -30,12 +41,47 @@ export const searchLinkedIn = defineOperation({
     sort: z.enum(["RELEVANCE", "DATE"]).optional().describe("Posts: sort order"),
     posted_within: z.enum(["PAST_DAY", "PAST_WEEK", "PAST_MONTH"]).optional().describe("Posts: recency window"),
     ...offsetPagination,
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe("Max items to return (API default 10; category endpoints cap at 50, the url form allows up to 100)"),
   },
   outputShape: pageOutputShape,
   annotations: READ,
   cli: { group: "search", command: "run", positional: "category" },
   run: async ({ client, accountId }, input) => {
-    const category = input.category as "people" | "companies" | "posts";
+    const url = input.url as string | undefined;
+    const offset = (input.offset as number | undefined) ?? 0;
+    const limit = (input.limit as number | undefined) ?? 10;
+
+    if (url !== undefined) {
+      const offenders = CATEGORY_ONLY_FIELDS.filter((k) => input[k] !== undefined);
+      if (offenders.length > 0) {
+        throw new UsageError(`url cannot be combined with: ${offenders.join(", ")}.`);
+      }
+      const page = toPage(
+        await client.request<ListEnvelope>({
+          method: "POST",
+          path: `/v2/${accountId}/linkedin/search`,
+          query: { limit: input.limit as number | undefined, offset: input.offset as number | undefined },
+          body: { url },
+        })
+      );
+      return withOffsets(page, offset, limit);
+    }
+
+    const category = input.category as "people" | "companies" | "posts" | undefined;
+    if (category === undefined) {
+      throw new UsageError("category is required unless url is provided.");
+    }
+    // The category endpoints cap at 50/page even though the shared schema allows up to 100 to
+    // accommodate the url form above — enforce that narrower cap here instead of in zod.
+    if (limit > 50) {
+      throw new UsageError("limit must be 50 or less for category search (the url form allows up to 100).");
+    }
     const body: Record<string, unknown> = {};
     if (input.keywords !== undefined) body.keywords = input.keywords;
     if (category === "people") {
@@ -67,8 +113,6 @@ export const searchLinkedIn = defineOperation({
     if (category === "posts" && (input.location !== undefined || input.industry !== undefined)) {
       throw new UsageError("Filters location/industry do not apply to category=posts.");
     }
-    const offset = (input.offset as number | undefined) ?? 0;
-    const limit = (input.limit as number | undefined) ?? 10;
     const page = toPage(
       await client.request<ListEnvelope>({
         method: "POST",

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { UnipileClient } from "../../src/core/client.js";
 import {
-  followUser, getCompany, getProfile, listConnections, listInvitations, respondInvitation, sendInvitation,
+  followUser, getCompany, getProfile, listConnections, listInvitations, removeConnection, respondInvitation, sendInvitation,
 } from "../../src/core/operations/network.js";
 
 function ctxCapturing(responses: unknown[]) {
@@ -77,5 +77,16 @@ describe("network ops", () => {
     const b = ctxCapturing([{ object: "UserUnfollowed" }]);
     await followUser.run(b.ctx, { user_id: "u3", action: "unfollow" });
     expect(call(b.f).url).toContain("/users/me/unfollow/u3");
+  });
+
+  it("removeConnection DELETEs the relations path with no body and returns removed:true on 204", async () => {
+    const f = vi.fn(async () => new Response(null, { status: 204 }));
+    const ctx = { client: new UnipileClient({ apiKey: "k", fetchImpl: f as unknown as typeof fetch }), accountId: "acc_1" };
+    const out = await removeConnection.run(ctx, { user_id: "u4" });
+    const [url, init] = f.mock.calls[0] as unknown as [URL, RequestInit];
+    expect(String(url)).toBe("https://api.unipile.com/v2/acc_1/users/me/relations/u4");
+    expect(init.method).toBe("DELETE");
+    expect(init.body).toBeUndefined();
+    expect(out).toEqual({ removed: true });
   });
 });
