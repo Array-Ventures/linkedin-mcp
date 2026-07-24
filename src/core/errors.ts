@@ -48,3 +48,12 @@ export class UnipileApiError extends Error {
     super(formatApiError(status, type, title, detail, reqId, retryAfterSeconds));
   }
 }
+
+export function errorToText(err: unknown): string {
+  if (err instanceof UnipileApiError) {
+    const meta = { status: err.status, type: err.type, req_id: err.reqId, retry_after_seconds: err.retryAfterSeconds };
+    return `${err.message}\n${JSON.stringify(meta)}`;
+  }
+  if (err instanceof ConfigError || err instanceof UsageError) return err.message;
+  return `Unexpected error: ${err instanceof Error ? err.message : String(err)}`;
+}
