@@ -5,15 +5,6 @@ import type { ListEnvelope } from "./shared.js";
 
 import { READ_ANNOTATIONS as READ, WRITE_ANNOTATIONS as WRITE } from "./shared.js";
 
-export const LINKEDIN_REACTIONS = [
-  "linkedin_like",
-  "linkedin_celebrate",
-  "linkedin_support",
-  "linkedin_love",
-  "linkedin_insightful",
-  "linkedin_funny",
-] as const;
-
 export const listPosts = defineOperation({
   name: "linkedin_list_posts",
   title: "List a user's posts",
@@ -117,28 +108,5 @@ export const addComment = defineOperation({
     const base = `/v2/${accountId}/posts/${encodeURIComponent(input.post_id as string)}/comments`;
     const path = input.reply_to !== undefined ? `${base}/${encodeURIComponent(input.reply_to as string)}` : base;
     return { item: await client.request<Record<string, unknown>>({ method: "POST", path, body: { text: input.text } }) };
-  },
-});
-
-export const reactToPost = defineOperation({
-  name: "linkedin_react_to_post",
-  title: "React to a post",
-  description: "Add or remove the account owner's reaction on a post (like, celebrate, support, love, insightful, funny).",
-  mutates: true,
-  inputShape: {
-    post_id: z.string().min(1).describe("Post id"),
-    reaction: z.enum(LINKEDIN_REACTIONS).describe("Reaction type"),
-    action: z.enum(["add", "remove"]).describe("Add or remove the reaction"),
-  },
-  outputShape: { result: z.string() },
-  annotations: WRITE,
-  cli: { group: "react", command: "set" },
-  run: async ({ client, accountId }, input) => {
-    const res = await client.request<{ object: string }>({
-      method: input.action === "add" ? "POST" : "DELETE",
-      path: `/v2/${accountId}/posts/${encodeURIComponent(input.post_id as string)}/reactions`,
-      body: { reaction: input.reaction },
-    });
-    return { result: res.object };
   },
 });
