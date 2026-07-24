@@ -1,0 +1,9 @@
+# secrets — .mcp.json contains the Unipile API key header
+.env
+.env.*
+.mcp.json
+
+node_modules/
+dist/
+*.log
+.DS_Store
