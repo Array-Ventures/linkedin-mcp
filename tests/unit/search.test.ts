@@ -42,6 +42,41 @@ describe("search ops", () => {
     expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/linkedin/search/parameters?type=LOCATION&keywords=san+francisco");
     expect(out.items).toHaveLength(1);
   });
+
+  it("rejects category-inapplicable filters with zero network calls", async () => {
+    const cases: Array<Record<string, unknown>> = [
+      { category: "companies", title: "founder" },
+      { category: "companies", network_distance: [1] },
+      { category: "people", sort: "DATE" },
+      { category: "companies", posted_within: "PAST_WEEK" },
+      { category: "posts", location: ["loc1"] },
+      { category: "posts", industry: ["ind1"] },
+    ];
+    for (const input of cases) {
+      const { ctx, f } = ctxCapturing([{ body: { data: [] } }]);
+      await expect(searchLinkedIn.run(ctx, input)).rejects.toThrow(/only apply|do not apply/);
+      expect(f).not.toHaveBeenCalled();
+    }
+  });
+
+  it("carries offset/next_offset through search results", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [{ id: "a" }, { id: "b" }], total_count: 5 } }]);
+    const out = await searchLinkedIn.run(ctx, { category: "people", keywords: "x", limit: 2, offset: 2 });
+    expect(call(f).url).toContain("limit=2");
+    expect(call(f).url).toContain("offset=2");
+    expect(out).toMatchObject({ offset: 2, next_offset: 4 });
+  });
+
+  it("omits next_offset on the terminal page and forwards offsets in params search", async () => {
+    const a = ctxCapturing([{ body: { data: [{ id: "a" }], total_count: 3 } }]);
+    const terminal = await searchLinkedIn.run(a.ctx, { category: "people", limit: 2, offset: 2 });
+    expect(terminal.next_offset).toBeUndefined();
+
+    const b = ctxCapturing([{ body: { data: [{ object: "SearchParameter", id: "l1", name: "SF" }] } }]);
+    const params = await getSearchParameters.run(b.ctx, { type: "LOCATION", keywords: "sf", limit: 1, offset: 5 });
+    expect(call(b.f).url).toContain("offset=5");
+    expect(params).toMatchObject({ offset: 5, next_offset: 6 });
+  });
 });
 
 describe("whoami", () => {
@@ -80,5 +115,14 @@ describe("whoami", () => {
       { status: 429, body: { type: "api/too_many_requests", title: "Too many" } },
     ]);
     await expect(whoami.run(ctx, {})).rejects.toThrow(UnipileApiError);
+  });
+
+  it("tolerates 404 from inmail credits", async () => {
+    const { ctx } = ctxCapturing([
+      { body: { object: "Account", id: "acc_1", provider: "linkedin", status: "running" } },
+      { body: { object: "UserProfile", id: "me1" } },
+      { status: 404, body: { type: "errors/not_found", title: "Not found" } },
+    ]);
+    expect((await whoami.run(ctx, {})).inmail_credits).toBeNull();
   });
 });

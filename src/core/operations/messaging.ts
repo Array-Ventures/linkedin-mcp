@@ -107,12 +107,15 @@ export const startChat = defineOperation({
     user_id: z.string().min(1).describe("Provider id of the user to contact (from search or profile)"),
     text: z.string().min(1).describe("First message text (plain text)"),
     inmail: z.boolean().optional().describe("Send as classic InMail instead of a normal message"),
-    subject: z.string().optional().describe("Sales Navigator InMail subject (implies Sales Navigator sending)"),
+    subject: z.string().optional().describe("Sales Navigator InMail subject (implies Sales Navigator sending). Cannot be combined with inmail."),
   },
   outputShape: { chat_id: z.string(), message_ids: z.array(z.string()) },
   annotations: WRITE,
   cli: { group: "chats", command: "start" },
   run: async ({ client, accountId }, input) => {
+    if (input.subject !== undefined && input.inmail === true) {
+      throw new UsageError("Pass either inmail (classic InMail) or subject (Sales Navigator InMail), not both.");
+    }
     const body: Record<string, unknown> = { text: input.text, users_ids: input.user_id };
     if (input.subject !== undefined) {
       body.specifics = { linkedin: { sales_navigator: { subject: input.subject } } };

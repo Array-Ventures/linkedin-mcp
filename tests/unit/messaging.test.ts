@@ -68,4 +68,10 @@ describe("messaging ops", () => {
     await listMessages.run(ctx, { chat_id: "c1", cursor: "x" });
     expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1/messages?cursor=x");
   });
+
+  it("startChat rejects inmail+subject combination", async () => {
+    const { ctx, f } = ctxCapturing([{ }]);
+    await expect(startChat.run(ctx, { user_id: "u1", text: "x", inmail: true, subject: "Intro" })).rejects.toThrow(/not both/);
+    expect(f).not.toHaveBeenCalled();
+  });
 });
