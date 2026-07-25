@@ -14,6 +14,7 @@ import {
   markMessageRead,
   sendMessage,
   startChat,
+  updateChat,
 } from "./messaging.js";
 import {
   followUser,
@@ -42,7 +43,7 @@ export const operations: OperationDef[] = [
   // messaging
   listChats, getChat, listMessages, sendMessage, startChat, markChatRead,
   getMessage, deleteMessage, markMessageRead, forwardMessage, editMessage,
-  listParticipants, manageParticipants, getAttachmentLinks,
+  listParticipants, manageParticipants, getAttachmentLinks, updateChat,
   // network
   getProfile, getCompany, listConnections, listInvitations, sendInvitation, respondInvitation, followUser,
   removeConnection,

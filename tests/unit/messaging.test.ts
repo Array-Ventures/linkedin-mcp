@@ -15,6 +15,7 @@ import {
   markMessageRead,
   sendMessage,
   startChat,
+  updateChat,
 } from "../../src/core/operations/messaging.js";
 import { UsageError } from "../../src/core/errors.js";
 
@@ -267,5 +268,46 @@ describe("messaging ops", () => {
     await expect(
       getAttachmentLinks.run(ctx, { chat_id: "c1", message_id: "m1", attachment_id: "nope" })
     ).rejects.toThrow(/no attachment with id "nope".*a1/s);
+  });
+
+  it("updateChat maps friendly fields to the API's *_status shape", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "Chat", id: "c1" }]);
+    const out = await updateChat.run(ctx, { chat_id: "c1", archive: true, pin: false, label: "leads", name: "Deal room" });
+    expect(call(f)).toMatchObject({ method: "PATCH" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/chats/c1");
+    expect(call(f).body).toEqual({ archive_status: true, pin_status: false, label: "leads", name: "Deal room" });
+    expect(out).toEqual({ item: { object: "Chat", id: "c1" } });
+  });
+
+  it("updateChat supports indefinite mute and a mute deadline, but not both", async () => {
+    const a = ctxCapturing([{ object: "Chat", id: "c1" }]);
+    await updateChat.run(a.ctx, { chat_id: "c1", mute: true });
+    expect(call(a.f).body).toEqual({ muted_until: true });
+
+    const b = ctxCapturing([{ object: "Chat", id: "c1" }]);
+    await updateChat.run(b.ctx, { chat_id: "c1", mute_until: "2026-08-01T00:00:00.000Z" });
+    expect(call(b.f).body).toEqual({ muted_until: "2026-08-01T00:00:00.000Z" });
+
+    const c = ctxCapturing([{}]);
+    await expect(
+      updateChat.run(c.ctx, { chat_id: "c1", mute: true, mute_until: "2026-08-01T00:00:00.000Z" })
+    ).rejects.toThrow(/not both/);
+    expect(c.f).not.toHaveBeenCalled();
+
+    const d = ctxCapturing([{ object: "Chat", id: "c1" }]);
+    await updateChat.run(d.ctx, { chat_id: "c1", mute: false });
+    expect(call(d.f).body).toEqual({ muted_until: false });
+  });
+
+  it("updateChat refuses an empty patch with zero network calls", async () => {
+    const { ctx, f } = ctxCapturing([{}]);
+    await expect(updateChat.run(ctx, { chat_id: "c1" })).rejects.toThrow(/at least one/);
+    expect(f).not.toHaveBeenCalled();
+  });
+
+  it("updateChat does not touch read state (that is linkedin_mark_chat_read)", async () => {
+    const { ctx, f } = ctxCapturing([{ object: "Chat", id: "c1" }]);
+    await updateChat.run(ctx, { chat_id: "c1", archive: true });
+    expect(call(f).body).not.toHaveProperty("read_status");
   });
 });

@@ -402,3 +402,49 @@ export const getAttachmentLinks = defineOperation({
     return { attachments: picked };
   },
 });
+
+export const updateChat = defineOperation({
+  name: "linkedin_update_chat",
+  title: "Archive, pin, mute or label a chat",
+  description:
+    "Manage a conversation's state for inbox triage: archive/unarchive, pin/unpin, mute/unmute, set a label, or rename (renaming usually works on group chats only). Provide at least one field; all are reversible. Muting takes either mute=true/false for an indefinite mute/unmute, or mute_until with an ISO 8601 UTC datetime. To change read state use linkedin_mark_chat_read instead. Support varies by provider — LinkedIn silently ignores fields it does not implement, so re-read the chat with linkedin_get_chat to confirm what stuck.",
+  mutates: true,
+  inputShape: {
+    chat_id: z.string().min(1).describe("Chat id to update"),
+    archive: z.boolean().optional().describe("true archives the chat (hides it from the main inbox), false restores it"),
+    pin: z.boolean().optional().describe("true pins the chat to the top of the list, false unpins it"),
+    mute: z.boolean().optional().describe("true mutes indefinitely, false unmutes. Cannot be combined with mute_until"),
+    mute_until: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("Mute until this ISO 8601 UTC datetime, e.g. 2026-08-01T00:00:00.000Z. Cannot be combined with mute"),
+    label: z.string().min(1).optional().describe("Associate the chat with this label, if the provider supports labels"),
+    name: z.string().min(1).optional().describe("Custom chat name — most providers allow this on group chats only"),
+  },
+  outputShape: itemOutputShape,
+  annotations: WRITE,
+  cli: { group: "chats", command: "update" },
+  run: async ({ client, accountId }, input) => {
+    if (input.mute !== undefined && input.mute_until !== undefined) {
+      throw new UsageError("Pass either mute (indefinite) or mute_until (a datetime), not both.");
+    }
+    const body: Record<string, unknown> = {};
+    if (input.archive !== undefined) body.archive_status = input.archive;
+    if (input.pin !== undefined) body.pin_status = input.pin;
+    if (input.mute !== undefined) body.muted_until = input.mute;
+    if (input.mute_until !== undefined) body.muted_until = input.mute_until;
+    if (input.label !== undefined) body.label = input.label;
+    if (input.name !== undefined) body.name = input.name;
+    if (Object.keys(body).length === 0) {
+      throw new UsageError("Provide at least one of archive, pin, mute, mute_until, label or name.");
+    }
+    return {
+      item: await client.request<Record<string, unknown>>({
+        method: "PATCH",
+        path: `/v2/${accountId}/chats/${encodeURIComponent(input.chat_id as string)}`,
+        body,
+      }),
+    };
+  },
+});

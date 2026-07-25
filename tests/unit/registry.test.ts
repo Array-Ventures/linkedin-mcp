@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { operations } from "../../src/core/operations/index.js";
 
 describe("operations registry", () => {
-  it("has 41 uniquely-named linkedin_ tools", () => {
-    expect(operations).toHaveLength(41);
+  it("has 42 uniquely-named linkedin_ tools", () => {
+    expect(operations).toHaveLength(42);
     const names = operations.map((o) => o.name);
     expect(new Set(names).size).toBe(names.length);
     for (const n of names) expect(n).toMatch(/^linkedin_[a-z_]+$/);
@@ -23,7 +23,7 @@ describe("operations registry", () => {
     expect(new Set(pairs).size).toBe(pairs.length);
   });
 
-  it("exposes exactly the 41 expected tools", () => {
+  it("exposes exactly the 42 expected tools", () => {
     expect(operations.map((o) => o.name).sort()).toEqual([
       "linkedin_add_comment", "linkedin_create_post", "linkedin_delete_comment",
       "linkedin_delete_message", "linkedin_delete_post", "linkedin_edit_comment",
@@ -38,7 +38,7 @@ describe("operations registry", () => {
       "linkedin_mark_message_read", "linkedin_react", "linkedin_react_to_message",
       "linkedin_remove_connection", "linkedin_respond_invitation", "linkedin_search",
       "linkedin_send_invitation", "linkedin_send_message", "linkedin_start_chat",
-      "linkedin_update_profile", "linkedin_whoami",
+      "linkedin_update_chat", "linkedin_update_profile", "linkedin_whoami",
     ]);
   });
 });

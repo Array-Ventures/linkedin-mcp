@@ -28,6 +28,14 @@ LinkedIn cannot filter by unread server-side — check each chat's `unread_count
     linkedin chats start --user-id <id> --text "..." --inmail   # InMail (needs credits)
     linkedin chats read --chat-id <id>                     # marks the whole chat read
 
+Inbox triage — archive, pin, mute, label (all reversible):
+
+    linkedin chats update --chat-id <id> --archive         # --archive / --pin / --mute are booleans
+    linkedin chats update --chat-id <id> --mute-until 2026-08-01T00:00:00.000Z
+    linkedin chats update --chat-id <id> --label "leads" --name "Deal room"
+
+LinkedIn silently ignores chat fields it doesn't implement — re-read with `linkedin chats get` to confirm what stuck.
+
 Messaging someone who sent you a PENDING invitation needs the invitation id:
 
     linkedin chats start --user-id <id> --text "..." --relation-request-id <id>
