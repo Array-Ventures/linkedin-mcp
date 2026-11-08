@@ -25,7 +25,7 @@ export const searchLinkedIn = defineOperation({
   name: "linkedin_search",
   title: "Search LinkedIn (classic)",
   description:
-    "Classic LinkedIn search for people, companies, or posts — either by category (default) or by pasting a LinkedIn Classic search URL copied from the browser via url. Exactly one of category or url is required; when url is given, category and every category-only filter must be omitted, since the URL alone encodes the search. The url form routes across all four LinkedIn Classic search verticals (people, companies, jobs, or posts) depending on what the URL encodes — Unipile's spec does not document which exact URL shapes are accepted, so treat that as unverified until tried against a real URL. Filter fields like location/industry/current_company take parameter IDS — resolve names to ids first with linkedin_get_search_parameters. People-only filters: network_distance, location, industry, current_company, first_name, last_name, title. Posts-only: sort, posted_within. Results are paginated by offset (category endpoints cap at 50/page; the url form allows up to 100/page; LinkedIn caps total results ~1000/day). Sales Navigator search is not wrapped yet — use the CLI raw command if needed.",
+    "Classic LinkedIn search for people, companies, or posts — either by category (default) or by pasting a LinkedIn Classic search URL copied from the browser via url. Exactly one of category or url is required; when url is given, category and every category-only filter must be omitted, since the URL alone encodes the search. The url form routes across all four LinkedIn Classic search verticals (people, companies, jobs, or posts) depending on what the URL encodes — Unipile's spec does not document which exact URL shapes are accepted, so treat that as unverified until tried against a real URL. Filter fields like location/industry/current_company take parameter IDS — resolve names to ids first with linkedin_get_search_parameters. People-only filters: network_distance, location, industry, current_company, first_name, last_name, title. Posts-only: sort, posted_within. Category results use next_cursor pagination; people/companies have provider-controlled page sizes, posts allow limit up to 49. URL search supports cursor or offset and limit up to 100; LinkedIn imposes account-specific quotas. Sales Navigator search is not wrapped yet — use the CLI raw command if needed.",
   mutates: false,
   inputShape: {
     category: z.enum(["people", "companies", "posts"]).optional().describe("What to search for (required unless url is given)"),
@@ -41,13 +41,14 @@ export const searchLinkedIn = defineOperation({
     sort: z.enum(["RELEVANCE", "DATE"]).optional().describe("Posts: sort order"),
     posted_within: z.enum(["PAST_DAY", "PAST_WEEK", "PAST_MONTH"]).optional().describe("Posts: recency window"),
     ...offsetPagination,
+    cursor: z.string().min(1).optional().describe("Opaque next_cursor from the previous search page; cannot be combined with offset"),
     limit: z
       .number()
       .int()
       .min(1)
       .max(100)
       .optional()
-      .describe("Max items to return (API default 10; category endpoints cap at 50, the url form allows up to 100)"),
+      .describe("URL search: up to 100; posts: up to 49 (default 3); omit for people/companies"),
   },
   outputShape: pageOutputShape,
   annotations: READ,
@@ -56,6 +57,10 @@ export const searchLinkedIn = defineOperation({
     const url = input.url as string | undefined;
     const offset = (input.offset as number | undefined) ?? 0;
     const limit = (input.limit as number | undefined) ?? 10;
+
+    if (input.cursor !== undefined && input.offset !== undefined) {
+      throw new UsageError("cursor cannot be combined with offset.");
+    }
 
     if (url !== undefined) {
       const offenders = CATEGORY_ONLY_FIELDS.filter((k) => input[k] !== undefined);
@@ -66,21 +71,25 @@ export const searchLinkedIn = defineOperation({
         await client.request<ListEnvelope>({
           method: "POST",
           path: `/v2/${accountId}/linkedin/search`,
-          query: { limit: input.limit as number | undefined, offset: input.offset as number | undefined },
+          query: { limit: input.limit as number | undefined, offset: input.offset as number | undefined, cursor: input.cursor as string | undefined },
           body: { url },
         })
       );
-      return withOffsets(page, offset, limit);
+      return input.cursor !== undefined || page.next_cursor !== undefined ? page : withOffsets(page, offset, limit);
     }
 
     const category = input.category as "people" | "companies" | "posts" | undefined;
     if (category === undefined) {
       throw new UsageError("category is required unless url is provided.");
     }
-    // The category endpoints cap at 50/page even though the shared schema allows up to 100 to
-    // accommodate the url form above — enforce that narrower cap here instead of in zod.
-    if (limit > 50) {
-      throw new UsageError("limit must be 50 or less for category search (the url form allows up to 100).");
+    if (input.offset !== undefined) {
+      throw new UsageError("Category search uses cursor pagination; pass next_cursor as cursor instead of offset.");
+    }
+    if (category !== "posts" && input.limit !== undefined) {
+      throw new UsageError("limit is not supported for people/companies search; omit it and use cursor for paging.");
+    }
+    if (category === "posts" && input.limit !== undefined && limit > 49) {
+      throw new UsageError("limit must be 49 or less for posts search.");
     }
     const body: Record<string, unknown> = {};
     if (input.keywords !== undefined) body.keywords = input.keywords;
@@ -117,11 +126,11 @@ export const searchLinkedIn = defineOperation({
       await client.request<ListEnvelope>({
         method: "POST",
         path: `/v2/${accountId}/linkedin/search/${category}`,
-        query: { limit: input.limit as number | undefined, offset: input.offset as number | undefined },
+        query: { limit: input.limit as number | undefined, cursor: input.cursor as string | undefined },
         body,
       })
     );
-    return withOffsets(page, offset, limit);
+    return page;
   },
 });
 

@@ -46,7 +46,7 @@ pick it up automatically. `defineOperation` throws if `annotations` disagree wit
 
 **Conventions:** `linkedin_{verb}_{resource}` snake_case names; `READ_ANNOTATIONS` /
 `WRITE_ANNOTATIONS` from `operations/shared.js`; `cursorPagination` + `toPage` for cursor lists,
-`offsetPagination` + `withOffsets` for search; `encodeURIComponent` on **every** user-supplied path
+cursor pagination for category search; `offsetPagination` + `withOffsets` for search parameters and offset-mode URL search; `encodeURIComponent` on **every** user-supplied path
 segment; `UsageError` (not `Error`) for input conflicts so the CLI exits 2; unique `cli.group`/
 `cli.command` pairs.
 
@@ -98,7 +98,7 @@ Unipile enforces per-endpoint / per-sensitive-method / per-account windows serve
 them to *Recommended* in the Unipile dashboard — that is the real hard cap; client-side counters
 can't see other clients and reset on restart). `client.rateWindows` captures `x-ratelimit-*` off
 every response, and `rateInfo()` reports the **tightest window by fraction remaining** with a
-warning at ≤10%. `reset_in_seconds` is a **duration, not a timestamp**. The window is a ceiling,
+warning at ≤10%. Headers expose only one checked window per response; this is the tightest observed window, not all server windows. `reset_in_seconds` is a **duration, not a timestamp**. The window is a ceiling,
 never a target: on 429, stop that action type, never auto-retry a write.
 
 Known LinkedIn quotas: ~80–100 invitations/day (~200/week), 100–150 messages/day, 80–100 profile

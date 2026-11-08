@@ -204,3 +204,19 @@ Production is never touched by any automated test in this repository.
 ## License
 
 MIT
+
+
+## Unipile documentation baseline
+
+Reviewed against the official v2 reference (OpenAPI **2.65.1**); see
+[the API audit](docs/API-AUDIT.md) and dated source manifest in `docs/upstream/manifest.json`.
+
+Category search now uses `cursor` from `next_cursor`. **Breaking change:** omit
+`limit` for people/companies, and replace category `offset` with `cursor`.
+Posts accept `limit` 1–49 (provider default 3). URL search retains `offset` and
+`limit` up to 100 and also accepts `cursor`; never combine cursor and offset.
+Search-parameter lookup still uses offsets. Unsupported pagination inputs fail locally.
+Profile sections now include the documented `_preview` variants, which request fewer entries.
+
+Validation is offline. Live account access is not needed for build/unit tests; integration
+tests require a separate Unipile mock-provider app, never a production LinkedIn account.

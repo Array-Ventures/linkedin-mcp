@@ -15,7 +15,19 @@ const PROFILE_SECTIONS = [
   "linkedin_volunteer_experience",
   "linkedin_projects",
   "linkedin_recommendations",
+  "linkedin_recruiting_activity",
   "linkedin_interests",
+  "linkedin_*_preview",
+  "linkedin_experience_preview",
+  "linkedin_education_preview",
+  "linkedin_languages_preview",
+  "linkedin_skills_preview",
+  "linkedin_certifications_preview",
+  "linkedin_volunteer_experience_preview",
+  "linkedin_projects_preview",
+  "linkedin_recommendations_preview",
+  "linkedin_recruiting_activity_preview",
+  "linkedin_interests_preview"
 ] as const;
 
 export const getProfile = defineOperation({
