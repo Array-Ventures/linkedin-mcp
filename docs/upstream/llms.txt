@@ -1,0 +1,452 @@
+# Unipile Documentation
+
+> Unipile API  Transform your app into a powerful communication hub using our easy-to-integrate Email, Calendar, and Messaging APIs.
+
+## Documentation: Getting started
+- [Welcome](https://developer.unipile.com/v2.0/docs/welcome.md): Unipile is the Unified API to interact with messaging, mailing, calendar and social services from popular platforms.
+- [Fundamentals](https://developer.unipile.com/v2.0/docs/fundamentals.md): This guide provides a mental map of the fundamental concepts and workflow to start using Unipile.
+- [Quickstart](https://developer.unipile.com/v2.0/docs/quickstart.md): Learn how to get Unipile set up in your project and make your first requests with a Provider. The setup is the same for every provider.
+  - [LinkedIn](https://developer.unipile.com/v2.0/docs/linkedin-quickstart.md): Learn how to list chats of a Linkedin account and send a message in one of them using Unipile SDK.
+  - [WhatsApp](https://developer.unipile.com/v2.0/docs/whatsapp-quickstart.md): Learn how to list chats of a WhatsApp account and send a message in one of them using Unipile SDK.
+  - [Telegram](https://developer.unipile.com/v2.0/docs/telegram-quickstart.md): Learn how to list chats of a Telegram account and send a message in one of them using Unipile SDK.
+  - [Gmail](https://developer.unipile.com/v2.0/docs/gmail-quickstart.md): Learn how to list emails of a Gmail account and send emails using Unipile SDK.
+  - [Outlook](https://developer.unipile.com/v2.0/docs/outlook-quickstart.md): Learn how to list emails of an Outlook inbox and send emails using Unipile SDK.
+  - [IMAP](https://developer.unipile.com/v2.0/docs/imap-quickstart.md): Learn how to list emails of an IMAP account and send emails using Unipile SDK.
+  - [Facebook](https://developer.unipile.com/v2.0/docs/facebook-quickstart.md): Learn how to list chats of a Facebook account and send a message in one of them using Unipile SDK.
+- [Migration from v1](https://developer.unipile.com/v2.0/docs/migration-from-v1.md)
+  - [Transfer Accounts & Subscription](https://developer.unipile.com/v2.0/docs/transfer-accounts-subscription.md): This guide explains how to transfer your existing V1 subscription to V2 and optionally migrate your accounts and settings.
+  - [Migrate your codebase](https://developer.unipile.com/v2.0/docs/migrate-codebase-from-v1.md)
+    - [Authentication & Accounts](https://developer.unipile.com/v2.0/docs/migration-auth-and-accounts.md): This migration guide will help you migrate from v1 accounts to v2 accounts regarding authentication flows and connection managment.
+    - [Users API](https://developer.unipile.com/v2.0/docs/migration-users-api.md): This guide will help you migrate the Users features of your application to API v2.
+    - [Posts API](https://developer.unipile.com/v2.0/docs/migration-posts-api.md): This guide will help you migrate the Posts features of your application to API v2.
+    - [Calendar API](https://developer.unipile.com/v2.0/docs/migration-calendar-api.md): This guide will help you migrate the Calendar features of your application to API v2.
+    - [Email API](https://developer.unipile.com/v2.0/docs/migration-emails-api.md): This guide will help you migrate the Emailing features of your application to API v2.
+    - [Messaging API](https://developer.unipile.com/v2.0/docs/migration-messaging-api.md): This guide will help you migrate the Messaging features of your application to API v2.
+    - [LinkedIn API](https://developer.unipile.com/v2.0/docs/migration-linkedin-api.md): This guide will help you migrate the LinkedIn features of your application to API v2.
+    - [Webhooks](https://developer.unipile.com/v2.0/docs/migration-webhooks.md)
+- [Model context protocol (MCP)](https://developer.unipile.com/v2.0/docs/mcp.md): Connect your AI tools to Unipile using MCP
+- [Automation tools](https://developer.unipile.com/v2.0/docs/automation-tools.md): Automation platforms such as n8n, Make, and Zapier allow you to connect different services and automate workflows between them. These tools are commonly used to build integrations without writing…
+  - [n8n](https://developer.unipile.com/v2.0/docs/n8n.md): Learn how to create workflows using Unipile with n8n.
+  - [Make.com](https://developer.unipile.com/v2.0/docs/make-com.md): Learn how to create scenarios using Unipile with Make.com.
+  - [Zapier](https://developer.unipile.com/v2.0/docs/zapier.md): Learn how to create scenarios using Unipile with Zapier.
+
+## Documentation: Learn Unipile
+- [Platform Management](https://developer.unipile.com/v2.0/docs/platform-management.md): Manage your Unipile workspace, applications, and billing settings.
+  - [Dashboard Guide](https://developer.unipile.com/v2.0/docs/dashboard.md): Find your way around the Dashboard and choose a setup path for your integration.
+  - [Organizations](https://developer.unipile.com/v2.0/docs/organizations.md): Create organizations, manage members and roles, and require two-factor authentication.
+  - [Applications](https://developer.unipile.com/v2.0/docs/applications.md): Create and manage applications, environments, and application settings.
+  - [User Account and Security](https://developer.unipile.com/v2.0/docs/user-account-security.md): Manage your Dashboard login methods, password, two-factor authentication, and user account.
+  - [Hosted Auth Settings](https://developer.unipile.com/v2.0/docs/hosted-auth-settings.md): Configure Hosted Auth branding, displayed consent permissions, support links, and domains.
+  - [Scopes](https://developer.unipile.com/v2.0/docs/scopes.md): Isolate connected accounts and control which accounts each API key can access.
+  - [Custom Domains](https://developer.unipile.com/v2.0/docs/custom-domains.md): Verify and enable your own domains for Hosted Auth and email tracking.
+  - [Billing](https://developer.unipile.com/v2.0/docs/billing.md): Understand how Unipile billing works with pay-as-you-go pricing based on connected accounts.
+- [Provider Accounts](https://developer.unipile.com/v2.0/docs/provider-accounts.md): Accounts & Providers are a fundamental part of Unipile, here is the starting point to learn everything about them.
+  - [Link an Account](https://developer.unipile.com/v2.0/docs/link-an-account.md): To start using the API, the user must first authenticate with a provider. Once authenticated, the account is linked to Unipile, allowing you to interact with it through the API. There is a multiple…
+  - [Advanced Authentication](https://developer.unipile.com/v2.0/docs/advanced-authentication.md): Generate customized account connection and reconnection links from the Dashboard.
+  - [Manage Provider Accounts](https://developer.unipile.com/v2.0/docs/manage-provider-accounts.md): Inspect connected accounts, reconnect them, and manage their metadata, Scopes, and automatic proxies in the Dashboard.
+  - [Connection Status](https://developer.unipile.com/v2.0/docs/status-lifecycle.md): The connection status indicates whether Unipile can access data from the provider. Once an account is linked, it is considered operational and begins operating normally. However, certain expected…
+  - [Initial Sync](https://developer.unipile.com/v2.0/docs/initial-sync.md): Understanding the initial download of all historical data when an account is linked to Unipile.
+  - [Proxies](https://developer.unipile.com/v2.0/docs/proxies.md): In Unipile, a proxy is a secure intermediary that routes requests between Unipile and external providers. When interacting with an Account, requests don’t have to go directly from Unipile’s servers…
+  - [Configure OAuth](https://developer.unipile.com/v2.0/docs/configure-oauth.md): Learn how to configure production-ready OAuth flows for supported providers.
+    - [Permissions required](https://developer.unipile.com/v2.0/docs/oauth-permissions.md): Choose Google and Microsoft OAuth scopes for the Methods API and realtime events you use.
+    - [Register with Google](https://developer.unipile.com/v2.0/docs/google-oauth.md): To connect Google accounts to Unipile via OAuth authentication, you need to register your app in Google Cloud Console. You will then configure Unipile to use your Google application ID. If you…
+    - [Register with Microsoft](https://developer.unipile.com/v2.0/docs/microsoft-oauth.md): To connect Microsoft accounts to Unipile via OAuth authentication, you need to register your app in Azure Active Directory (AAD). You will then configure Unipile to use your AAD application ID. If…
+- [Methods](https://developer.unipile.com/v2.0/docs/methods.md): Methods are API Endpoints that provide access to read, write, and update many types of resources from the Provider.
+  - [Authenticate Requests](https://developer.unipile.com/v2.0/docs/api-keys.md): Create, secure, and use API Keys to authenticate requests to Unipile.
+  - [Manage Cache](https://developer.unipile.com/v2.0/docs/caching.md): Improve performance and reduce rate limit hits with Unipile's built-in caching. Learn what is cached, how invalidation works, and how to control cache per request.
+  - [Rate Limits](https://developer.unipile.com/v2.0/docs/rate-limits.md): Understand how Unipile enforces rate limiting to protect your integrations and stay within provider constraints. Learn how rules apply to methods, error handling, and configuration.
+  - [Provider's Restrictions](https://developer.unipile.com/v2.0/docs/provider-limits-and-restrictions.md): It's crucial to understand and manage the limits and restrictions imposed by each provider to ensure smooth operation of your applications. Below are the limitations and guidelines for interacting…
+- [Realtime](https://developer.unipile.com/v2.0/docs/realtime.md): Use webhooks to receive real-time notifications about events occurring on connected accounts.
+  - [Introduction to webhooks](https://developer.unipile.com/v2.0/docs/webhooks-introduction.md): Use webhooks to notify your application about realtime events in connected accounts.
+  - [Configure a webhook](https://developer.unipile.com/v2.0/docs/configure-a-webhook.md): Learn how to configure a new webhook and start receiving events in your app.
+  - [Test and Debug Webhooks](https://developer.unipile.com/v2.0/docs/test-debug-webhooks.md): Simulate events and provider failures, inspect delivery logs, and replay stored events from the Dashboard.
+
+## Documentation: Integration guides
+- [Provider Authentication](https://developer.unipile.com/v2.0/docs/provider-authentication.md): Integration guides for Unipile’s programmatic provider authentication options.
+  - [Hosted Authentication](https://developer.unipile.com/v2.0/docs/authenticate-with-hosted-auth.md): Learn how to let your users authenticate to their accounts from your application using the Hosted Auth wizard.
+  - [Custom Authentication](https://developer.unipile.com/v2.0/docs/authenticate-with-custom-auth.md): Learn how to integrate a full authentication flow within your application.
+    - [Credentials Flow](https://developer.unipile.com/v2.0/docs/credentials-flow.md): Integrate authentication for provider that accepts a set of credentials—such as a username and password, tokens, or connection parameters. During this process, the provider may also require the user…
+    - [QR Code Flow](https://developer.unipile.com/v2.0/docs/qr-code-flow.md): Integrate authentication for provider that requires a QR code to be scanned. A QR code have a short living time and must be refreshed when expired. Read on to implement this flow.
+    - [OAuth Flow](https://developer.unipile.com/v2.0/docs/oauth-flow.md): Integrate authentication for provider that use a standard OAuth flow.
+- [Email](https://developer.unipile.com/v2.0/docs/emails.md): Learn how to use Unipile to send, receive, and manage emails across providers while handling each provider-specific limits and behaviors.
+  - [Link email accounts](https://developer.unipile.com/v2.0/docs/link-email-accounts.md): Learn how to link emails accounts with Unipile API.
+  - [Create & Send emails](https://developer.unipile.com/v2.0/docs/send-emails.md): Learn how to send emails using Unipile API.
+  - [Track clicks & opens](https://developer.unipile.com/v2.0/docs/track-email-clicks-opens.md): Learn how to track link clicks and email opens using the Unipile API.
+  - [Retrieve emails](https://developer.unipile.com/v2.0/docs/list-emails.md): Learn how to retrieve emails using Unipile API.
+  - [Manage mailboxes](https://developer.unipile.com/v2.0/docs/manage-mailboxes.md): Learn how to manage email mailboxes using Unipile API.
+  - [Move & Read emails](https://developer.unipile.com/v2.0/docs/manage-emails.md): Learn how to move and read emails using Unipile API.
+  - [Manage drafts](https://developer.unipile.com/v2.0/docs/manage-drafts.md): Learn how to manage email drafts using Unipile API.
+  - [Bounce detection](https://developer.unipile.com/v2.0/docs/bounce-detection.md): Learn how to detect bounced emails using Unipile API.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/email-unsupported-features.md): The following features are not supported by Unipile.
+  - [Contacts](https://developer.unipile.com/v2.0/docs/email-contacts.md): Learn how to get email contacts using the Unipile API.
+- [Calendar](https://developer.unipile.com/v2.0/docs/calendars.md): Learn how to use Unipile to link calendars and manage events across providers while handling calendar-specific rules and constraints.
+  - [Link calendar accounts](https://developer.unipile.com/v2.0/docs/link-calendar-accounts.md): Learn how to link calendar accounts with Unipile API.
+  - [Create events](https://developer.unipile.com/v2.0/docs/create-events.md): Learn how to create calendar events using Unipile API.
+  - [Recurring events](https://developer.unipile.com/v2.0/docs/recurring-events.md): Learn how to deal with recurring events using Unipile API.
+  - [Edit & Delete events](https://developer.unipile.com/v2.0/docs/edit-delete-events.md): Learn how to edit and delete calendar events using Unipile API.
+  - [Manage calendars](https://developer.unipile.com/v2.0/docs/manage-calendars.md): Learn how to manage calendars using Unipile API.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/calendar-unsupported-features.md)
+  - [Respond to & cancel events](https://developer.unipile.com/v2.0/docs/respond-cancel-restore-events.md): Manage calendar invitations, cancellations, and supported event restoration.
+- [LinkedIn](https://developer.unipile.com/v2.0/docs/linkedin.md): Learn how to use Unipile to integrate LinkedIn accounts, messaging, posts, companies, and job postings while respecting LinkedIn-specific constraints.
+  - [Link accounts](https://developer.unipile.com/v2.0/docs/linkedin-link-accounts.md): Learn how to link a LinkedIn account with Unipile API.
+  - [Manage contracts](https://developer.unipile.com/v2.0/docs/linkedin-manage-contracts.md): Learn how to list, select, and monitor LinkedIn Recruiter and Sales Navigator contracts with Unipile API.
+  - [Messaging](https://developer.unipile.com/v2.0/docs/linkedin-messaging.md): Learn how to use Unipile to integrate LinkedIn messaging, sending, receiving, and managing chats while handling LinkedIn messaging limits and behaviors.
+    - [List chats & messages](https://developer.unipile.com/v2.0/docs/linkedin-retrieve-chats-messages.md): Learn how to get chats, groups and messages on LinkedIn using Unipile API.
+    - [Send messages](https://developer.unipile.com/v2.0/docs/linkedin-send-messages.md): Learn how to send messages on LinkedIn Classic using Unipile API.
+    - [Send messages with Recruiter](https://developer.unipile.com/v2.0/docs/linkedin-send-messages-with-recruiter.md): Learn how to send messages on LinkedIn Recruiter using Unipile API.
+    - [Send messages with Sales Navigator](https://developer.unipile.com/v2.0/docs/linkedin-send-messages-with-sales-navigator.md): Learn how to send messages on LinkedIn Recruiter using Unipile API.
+    - [Handle read status](https://developer.unipile.com/v2.0/docs/linkedin-handle-read-status.md): Learn how to handle read statuses on LinkedIn using Unipile API.
+    - [Mute conversations](https://developer.unipile.com/v2.0/docs/linkedin-mute-conversations.md): Learn how to mute / unmute LinkedIn conversations using Unipile API.
+    - [Manage reactions](https://developer.unipile.com/v2.0/docs/linkedin-manage-reactions.md): Learn how to manage message reactions on LinkedIn using Unipile API.
+    - [Edit & delete messages](https://developer.unipile.com/v2.0/docs/linkedin-edit-delete-messages.md): Learn how to edit and delete LinkedIn messages using Unipile API.
+    - [Manage groups](https://developer.unipile.com/v2.0/docs/linkedin-manage-groups.md): Learn how to manage LinkedIn groups using Unipile API.
+    - [Set presence indicator](https://developer.unipile.com/v2.0/docs/linkedin-set-presence.md): Learn how to set presence indicators on LinkedIn using Unipile API.
+  - [Users](https://developer.unipile.com/v2.0/docs/linkedin-users.md): Learn how to use Unipile to fetch and manage LinkedIn user profiles, invitations, and searches while handling LinkedIn-specific rules.
+    - [Profiles & Relations](https://developer.unipile.com/v2.0/docs/linkedin-fetch-users-profiles.md): Learn how to fetch complete user profiles on LinkedIn using Unipile API.
+    - [Search users](https://developer.unipile.com/v2.0/docs/linkedin-search-users.md): Learn how to search for users on LinkedIn using Unipile API.
+    - [Manage invitations](https://developer.unipile.com/v2.0/docs/linkedin-manage-invitations.md): Learn how to manage invitations on LinkedIn using Unipile API.
+    - [Detecting Accepted Invitations](https://developer.unipile.com/v2.0/docs/detecting-accepted-invitations.md): Learn how to identify when a user accepts your LinkedIn invitation, enabling you to initiate subsequent actions. You can monitor acceptance using Realtime or Periodic check.
+    - [Edit own profile](https://developer.unipile.com/v2.0/docs/linkedin-edit-own-profile.md): Learn how to edit your user profile on LinkedIn using Unipile API.
+    - [Retrieve profile views](https://developer.unipile.com/v2.0/docs/linkedin-profile-views.md): Retrieve LinkedIn profile visitors and analytics.
+  - [Companies](https://developer.unipile.com/v2.0/docs/linkedin-companies.md): Learn how to use Unipile to search and fetch LinkedIn companies while handling LinkedIn company data constraints.
+    - [Company Profiles](https://developer.unipile.com/v2.0/docs/fetch-company-profile.md): Learn how to fetch company profiles on LinkedIn using Unipile API.
+    - [Search companies](https://developer.unipile.com/v2.0/docs/search-companies.md): Learn how to search for companies on LinkedIn using Unipile API.
+    - [Invite members to follow a company](https://developer.unipile.com/v2.0/docs/invite-company-followers.md): Manage LinkedIn company page invitations and invitation credits.
+  - [Posts](https://developer.unipile.com/v2.0/docs/linkedin-posts.md): Learn how to use Unipile to create, list, and manage LinkedIn posts and engagement while handling LinkedIn content-specific rules and limits.
+    - [Retrieve posts](https://developer.unipile.com/v2.0/docs/linkedin-retrieve-posts.md): Learn how to retrieve posts on LinkedIn using Unipile API.
+    - [Perform posts search](https://developer.unipile.com/v2.0/docs/search-posts.md): Learn how to search for posts on LinkedIn using Unipile API.
+    - [Create posts](https://developer.unipile.com/v2.0/docs/linkedin-create-posts.md): Learn how to create a post on LinkedIn using Unipile API.
+    - [Manage post reactions](https://developer.unipile.com/v2.0/docs/linkedin-manage-post-reactions.md): Learn how to manage post reactions on LinkedIn using Unipile API.
+    - [Manage post comments](https://developer.unipile.com/v2.0/docs/linkedin-manage-post-comments.md): Learn how to manage post comments on LinkedIn using Unipile API.
+    - [Edit & delete posts](https://developer.unipile.com/v2.0/docs/linkedin-edit-delete-posts.md): Learn how to edit and delete LinkedIn posts using Unipile API.
+  - [Job postings](https://developer.unipile.com/v2.0/docs/linkedin-job-postings.md): Learn how to list, create, and manage LinkedIn job postings and applicants through Unipile while handling LinkedIn hiring-specific limits.
+    - [List job postings](https://developer.unipile.com/v2.0/docs/list-linkedin-job-postings.md): Learn how to retrieve job postings on LinkedIn using Unipile API.
+    - [Create job postings](https://developer.unipile.com/v2.0/docs/create-linkedin-job-postings.md): Learn how to create new job postings on LinkedIn using Unipile API.
+    - [Manage job postings](https://developer.unipile.com/v2.0/docs/manage-linkedin-job-postings.md): Learn how to manage existing job postings on LinkedIn using Unipile API.
+    - [Manage applicants](https://developer.unipile.com/v2.0/docs/manage-linkedin-job-applicants.md): Learn how to manage job applicants on LinkedIn using Unipile API.
+    - [Manage Recruiter projects & pipelines](https://developer.unipile.com/v2.0/docs/manage-recruiter-projects.md): Create hiring projects, browse candidates, and save candidates to a Recruiter pipeline.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/linkedin-unsupported-features.md): The following LinkedIn features are not supported by Unipile and are outside the scope of this guide.
+  - [Manage Sales Navigator lists](https://developer.unipile.com/v2.0/docs/sales-navigator-lists.md): Browse saved leads and accounts and add them to existing Sales Navigator lists.
+- [Instagram](https://developer.unipile.com/v2.0/docs/instagram.md): Learn how to use Unipile to integrate Instagram accounts, messaging, and posts while respecting Instagram-specific limitations.
+  - [Link accounts](https://developer.unipile.com/v2.0/docs/link-instagram-accounts.md): Learn how to link an Instagram account with Unipile API.
+  - [Messaging](https://developer.unipile.com/v2.0/docs/instagram-messaging.md): Learn how to use Unipile to integrate Instagram messaging, retrieve chats, and send messages while handling Instagram-specific limits.
+    - [Retrieve chats & messages](https://developer.unipile.com/v2.0/docs/instagram-retrieve-chats-messages.md): Learn how to retrieve Instagram chats and messages with Unipile API.
+    - [Send messages](https://developer.unipile.com/v2.0/docs/instagram-send-messages.md): Learn how to send messages on Instagram using Unipile API.
+    - [Manage groups](https://developer.unipile.com/v2.0/docs/instagram-manage-groups.md): Learn how to manage Instagram group conversations with Unipile API.
+    - [Manage reactions](https://developer.unipile.com/v2.0/docs/instagram-manage-reactions.md): Learn how to manage message reactions on Instagram using Unipile API.
+    - [Mute conversations](https://developer.unipile.com/v2.0/docs/instagram-mute-conversations.md): Learn how to mute / unmute Instagram conversations using Unipile API.
+    - [Handle read status](https://developer.unipile.com/v2.0/docs/instagram-handle-read-status.md): Learn how to mark Instagram chats as read or unread with Unipile API.
+    - [Set presence](https://developer.unipile.com/v2.0/docs/instagram-set-presence.md): Learn how to set Instagram presence with Unipile API.
+    - [Pin & unpin messages](https://developer.unipile.com/v2.0/docs/instagram-pin-messages.md): Pin important messages in Instagram conversations.
+  - [Posts](https://developer.unipile.com/v2.0/docs/instagram-posts.md): Learn how to use Unipile to list, publish, and manage Instagram posts and engagement.
+    - [List user posts](https://developer.unipile.com/v2.0/docs/instagram-list-user-posts.md): Learn how to get the posts of an Instagram user with Unipile API.
+    - [Create posts](https://developer.unipile.com/v2.0/docs/instagram-create-posts.md): Learn how to publish Instagram posts with Unipile API.
+    - [Manage post comments](https://developer.unipile.com/v2.0/docs/instagram-manage-post-comments.md): Learn how to list, add, and delete Instagram post comments with Unipile API.
+    - [Manage post reactions](https://developer.unipile.com/v2.0/docs/instagram-manage-post-reactions.md): Learn how to list, add, and remove Instagram post reactions with Unipile API.
+    - [Create stories](https://developer.unipile.com/v2.0/docs/instagram-create-stories.md): Publish an Instagram story with an image or video.
+    - [Find locations for Instagram posts](https://developer.unipile.com/v2.0/docs/instagram-search-locations.md): Resolve location identifiers before publishing an Instagram post.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/instagram-unsupported-features.md): The following Instagram features are not supported by Unipile and are outside the scope of this guide.
+- [Facebook](https://developer.unipile.com/v2.0/docs/facebook.md): Learn how to use Unipile to integrate Facebook accounts, Pages, Messenger conversations, and posts.
+  - [Link accounts](https://developer.unipile.com/v2.0/docs/facebook-link-accounts.md): Learn how to link a Facebook account and choose its Pages with Unipile API.
+  - [Facebook Pages](https://developer.unipile.com/v2.0/docs/facebook-pages.md): Learn how to answer conversations and publish as a Facebook Page with Unipile API.
+  - [Messaging](https://developer.unipile.com/v2.0/docs/facebook-messaging.md): Learn how to use Unipile to integrate Messenger conversations of Facebook accounts and Pages.
+    - [Retrieve chats & messages](https://developer.unipile.com/v2.0/docs/facebook-retrieve-chats-messages.md): Learn how to retrieve Facebook chats and messages with Unipile API.
+    - [Send messages](https://developer.unipile.com/v2.0/docs/facebook-send-messages.md): Learn how to send, edit, forward, and delete messages on Facebook using Unipile API.
+    - [Encrypted chats](https://developer.unipile.com/v2.0/docs/facebook-encrypted-chats.md): Learn how end-to-end encrypted Messenger chats behave with Unipile API.
+    - [Manage chats](https://developer.unipile.com/v2.0/docs/facebook-manage-chats.md): Learn how to accept requests, archive, mute, mark as read, and delete Facebook chats with Unipile API.
+    - [Manage groups](https://developer.unipile.com/v2.0/docs/facebook-manage-groups.md): Learn how to create Facebook group chats and manage their participants with Unipile API.
+    - [Manage reactions](https://developer.unipile.com/v2.0/docs/facebook-manage-reactions.md): Learn how to manage message reactions on Facebook using Unipile API.
+    - [Set presence](https://developer.unipile.com/v2.0/docs/facebook-set-presence.md): Learn how to manage the active status of a Facebook account with Unipile API.
+  - [Posts](https://developer.unipile.com/v2.0/docs/facebook-posts.md): Learn how to use Unipile to list, publish, and manage Facebook posts and engagement, as a user or as a Page.
+    - [List user posts](https://developer.unipile.com/v2.0/docs/facebook-list-user-posts.md): Learn how to get the posts and activity of a Facebook user or Page with Unipile API.
+    - [Create posts](https://developer.unipile.com/v2.0/docs/facebook-create-posts.md): Learn how to publish Facebook posts, as a user or as a Page, with Unipile API.
+    - [Edit & delete posts](https://developer.unipile.com/v2.0/docs/facebook-edit-delete-posts.md): Learn how to edit and delete Facebook posts using Unipile API.
+    - [Manage post comments](https://developer.unipile.com/v2.0/docs/facebook-manage-post-comments.md): Learn how to list, add, reply to, edit, and delete Facebook post comments with Unipile API.
+    - [Manage post reactions](https://developer.unipile.com/v2.0/docs/facebook-manage-post-reactions.md): Learn how to list, add, and remove reactions on Facebook posts and comments with Unipile API.
+  - [Users & relations](https://developer.unipile.com/v2.0/docs/facebook-users.md): Learn how to retrieve Facebook profiles and manage friends and follows with Unipile API.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/facebook-unsupported-features.md): The following Facebook features are not supported by Unipile and are outside the scope of this guide.
+- [WhatsApp](https://developer.unipile.com/v2.0/docs/whatsapp.md): Learn how to use Unipile to integrate WhatsApp messaging while handling WhatsApp-specific behaviors, limits, and features.
+  - [Link WhatsApp accounts](https://developer.unipile.com/v2.0/docs/link-whatsapp-accounts.md): Learn how to link a WhatsApp account with Unipile API.
+  - [Send messages](https://developer.unipile.com/v2.0/docs/whatsapp-send-messages.md): Learn how to send messages on WhatsApp using Unipile API.
+  - [Retrieve chats & messages](https://developer.unipile.com/v2.0/docs/whatsapp-retrieve-chats-messages.md): Learn how to retrieve chats, groups and messages on WhatsApp using Unipile API.
+  - [Handle read status](https://developer.unipile.com/v2.0/docs/whatsapp-mark-as-read.md): Learn how to handle read statuses on WhatsApp using Unipile API.
+  - [Set presence](https://developer.unipile.com/v2.0/docs/whatsapp-set-presence.md)
+  - [Manage reactions](https://developer.unipile.com/v2.0/docs/whatsapp-manage-reactions.md): Learn how to manage message reactions on WhatsApp using Unipile API.
+  - [Edit & Delete messages](https://developer.unipile.com/v2.0/docs/whatsapp-edit-delete-messages.md): Learn how to edit and delete WhatsApp messages using Unipile API.
+  - [Manage groups](https://developer.unipile.com/v2.0/docs/whatsapp-manage-groups.md): Learn how to manage WhatsApp groups using Unipile API.
+  - [Manage conversations](https://developer.unipile.com/v2.0/docs/whatsapp-mute-conversations.md): Learn how to mute, pin, archive and label WhatsApp conversations using Unipile API.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/whatsapp-unsupported-features.md): The following features are not supported by Unipile and are outside the scope of this guide:
+  - [Pin & unpin messages](https://developer.unipile.com/v2.0/docs/whatsapp-pin-messages.md): Pin important messages in WhatsApp conversations.
+- [Telegram](https://developer.unipile.com/v2.0/docs/telegram.md): Learn how to use Unipile to integrate Telegram presence and messaging while respecting Telegram-specific rules.
+  - [Link Telegram accounts](https://developer.unipile.com/v2.0/docs/link-telegram-accounts.md): Learn how to link a Telegram account with Unipile API.
+  - [Send messages](https://developer.unipile.com/v2.0/docs/telegram-send-messages.md): Learn how to send messages on Telegram using Unipile API.
+  - [Retrieve chats & messages](https://developer.unipile.com/v2.0/docs/telegram-retrieve-chats-messages.md): Learn how to retrieve chats, groups and messages on Telegram using Unipile API.
+  - [Handle read status](https://developer.unipile.com/v2.0/docs/telegram-handle-read-status.md): Learn how to handle read statuses on Telegram using Unipile API.
+  - [Set presence status](https://developer.unipile.com/v2.0/docs/telegram-set-presence.md): Learn how to update the presence status in Telegram using Unipile API.
+  - [Manage reactions](https://developer.unipile.com/v2.0/docs/telegram-manage-reactions.md): Learn how to manage message reactions on Telegram using Unipile API.
+  - [Edit & Delete messages](https://developer.unipile.com/v2.0/docs/telegram-edit-delete-messages.md): Learn how to edit and delete Telegram messages using Unipile API.
+  - [Manage groups](https://developer.unipile.com/v2.0/docs/telegram-manage-groups.md): Learn how to manage Telegram groups using Unipile API.
+  - [Mute conversations](https://developer.unipile.com/v2.0/docs/telegram-mute-conversations.md): Learn how to mute / unmute Telegram conversations using Unipile API.
+  - [Unsupported features](https://developer.unipile.com/v2.0/docs/telegram-unsupported-features.md): The following features are not supported by Unipile and are outside the scope of this guide:
+  - [Pin & unpin messages](https://developer.unipile.com/v2.0/docs/telegram-pin-messages.md): Pin important messages in Telegram conversations.
+  - [Retrieve pictures & user presence](https://developer.unipile.com/v2.0/docs/telegram-pictures-presence.md): Download Telegram chat and user pictures and retrieve current user presence.
+
+## Documentation: Resources
+- [Troubleshoot Connection Issues](https://developer.unipile.com/v2.0/docs/troubleshoot-connection-issues.md): Diagnose unavailable accounts, failed provider operations, and interrupted realtime events, then determine whether to retry, wait, or ask the user to reconnect.
+- [Methods & Events availability](https://developer.unipile.com/v2.0/docs/list-provider-features.md): Here is the current state of methods and realtime events implementations per provider.
+
+## API Reference: Api reference
+- [API Usage](https://developer.unipile.com/v2.0/reference/api-usage.md): Understand general concepts, response codes, and authentication strategies.
+- [Error responses](https://developer.unipile.com/v2.0/reference/error-responses.md): Troubleshoot problems with this comprehensive breakdown of all error codes.
+- [Caching](https://developer.unipile.com/v2.0/reference/cache.md): Unipile improves your application's performance and prevent hits of rate limiting by caching methods requests.  This page provides an in-depth look at Unipile caching mechanisms and the how to…
+- [Rate limit](https://developer.unipile.com/v2.0/reference/rate-limit.md): Rate limit information is returned through response headers, allowing clients to monitor the active rate limit window and adjust request throughput accordingly.
+- [Event types](https://developer.unipile.com/v2.0/reference/event-types-1.md): This is a list of all the types of events we currently send.
+
+## API Reference: Provider authentication
+- Hosted Auth
+  - [Create Auth Link](https://developer.unipile.com/v2.0/reference/createauthlink.md): Create a link to the hosted authentication wizard for the user to authenticate with the provider.
+- Custom Auth
+  - [Start Auth Intent](https://developer.unipile.com/v2.0/reference/startauthintent.md): Start an auth intent for a provider. This might require handling of checkpoints and oauth flows depending on the provider. Use <a…
+  - [Solve a Checkpoint](https://developer.unipile.com/v2.0/reference/solvecheckpoint.md): Solve the current checkpoint for the given authentication intent.
+  - [Request Checkpoint](https://developer.unipile.com/v2.0/reference/requestcheckpoint.md): Request a checkpoint for the given authentication intent. This can be used to request a different type of checkpoint if the first one was not successful.
+  - [Resend Checkpoint Notification or Code](https://developer.unipile.com/v2.0/reference/resendcheckpoint.md): Resend the notification or code for the current checkpoint of the given authentication intent. Use Request Checkpoint to request a different checkpoint.
+
+## API Reference: Methods
+- Messaging
+  - Chats
+    - [Get a Chat Picture](https://developer.unipile.com/v2.0/reference/getchatpicture.md): Downloads the picture of the specified Chat, for the providers that publish no public url for it. The url of this endpoint is given by the `private_picture_download_url` field of a Chat.
+    - [Start a Chat](https://developer.unipile.com/v2.0/reference/startchat.md): Starts a new 1to1 or group chat by sending the first message.       Use <a href="https://developer.unipile.com/v2.0/reference/sendmessage">Send a Message</a> if a conversation already exist with the…
+    - [List all Chats](https://developer.unipile.com/v2.0/reference/getchatslist.md): Returns a list of account's chats, whatever the inbox they belong to. The chats are returned sorted by their last message date, with the most recent appearing first.       You might want to use the…
+    - [Get a Chat](https://developer.unipile.com/v2.0/reference/getchat.md): Retrieves a Chat object.
+    - [Get a User Chat](https://developer.unipile.com/v2.0/reference/getuserchat.md): Resolves chat identifiers associated with the specified User. Depending on the provider, the result may include chats with or without message history, and may return multiple matches across inboxes…
+    - [Update a Chat](https://developer.unipile.com/v2.0/reference/updatechat.md): Updates the specified chat by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
+    - [Accept a Chat Request](https://developer.unipile.com/v2.0/reference/acceptchatrequest.md): Accepts a chat request from an inbox that contains pending conversations.
+    - [Delete a Chat](https://developer.unipile.com/v2.0/reference/deletechat.md): Deletes a chat if supported by the provider.
+    - [List all Inboxes](https://developer.unipile.com/v2.0/reference/getinboxeslist.md): Returns a list of the account's Inboxes.
+    - [Start a Chat from Inbox](https://developer.unipile.com/v2.0/reference/startchatfrominbox.md): Starts a new 1to1 or group chat in the given inbox by sending the first message.       Use <a href="https://developer.unipile.com/v2.0/reference/sendmessage">Send a Message</a> if a conversation…
+    - [List Inbox Chats](https://developer.unipile.com/v2.0/reference/getinboxchatslist.md): Returns a list of account's chats from a specific inbox.       The chats are returned sorted by their last message date, with the most recent appearing first.       Filters are applied with an AND…
+  - Messages
+    - [Send a Message](https://developer.unipile.com/v2.0/reference/sendmessage.md): Sends a message in the specified chat.       Use <a href="https://developer.unipile.com/v2.0/reference/startchat">Start a Chat</a> or <a…
+    - [List all Chat Messages](https://developer.unipile.com/v2.0/reference/getmessageslist.md): Returns a list of messages in a chat. The messages are returned sorted by their timestamp, with the most recent appearing first.
+    - [Get a Message](https://developer.unipile.com/v2.0/reference/getmessage.md): Retrieves a message object.
+    - [Get a Message Attachment](https://developer.unipile.com/v2.0/reference/getattachment.md): Download the attachment file of a message.
+    - [Forward a Message](https://developer.unipile.com/v2.0/reference/forwardmessage.md): Forwards a message to another chat.
+    - [Modify a Message](https://developer.unipile.com/v2.0/reference/modifymessage.md): Modifies one of the account's owner messages.       Trying to modify the message of another user will fail.
+    - [Read a Message](https://developer.unipile.com/v2.0/reference/readmessage.md): Marks a message sent in the chat by another user as read by you.         Trying to mark your own messages as read will fail.         This does not affect the read status of the chat. Use <a…
+    - [Pin a Message](https://developer.unipile.com/v2.0/reference/pinmessage.md): Pins the specified message at the top of its chat, or unpins it, if supported by the provider.       Pinning the message of another user is allowed, but providers might require an admin role or some…
+    - [Delete a Message](https://developer.unipile.com/v2.0/reference/deletemessage.md): Deletes one of your own messages. Depending of the provider, the message might still be visible as deleted.       Trying to delete the message of another user will fail.
+  - Group Participants
+    - [Add a Chat Participant](https://developer.unipile.com/v2.0/reference/addparticipant.md): Adds a new user as participant of chat if you have the rights to. Providers might requires an admin role or some permissions.       Trying to add a participant into a 1to1 chat can fail depending on…
+    - [Remove a Chat Participant](https://developer.unipile.com/v2.0/reference/removeparticipant.md): Removes a participant user from a chat if you have the rights to. Providers might requires an admin role or some permissions.       Trying to remove a participant from a 1to1 chat will fail.
+    - [List all Chat Participants](https://developer.unipile.com/v2.0/reference/getparticipantslist.md): Returns a list of participants in the specified group chat. For 1to1 chats, the unique participant is given in the chat object.       Trying to retrieve the list of participants of a 1to1 chat will…
+  - Message Reactions
+    - [Add a Message Reaction](https://developer.unipile.com/v2.0/reference/addmessagereaction.md): Adds a reaction to a message. Some providers only allow the use of a limited list of emojis, trying to react with an unsupported emoji will fail.
+    - [Remove a Message Reaction](https://developer.unipile.com/v2.0/reference/removemessagereaction.md): Removes a reaction of the account's owner from a message.       Trying to remove a reaction from another user will fail.
+    - [List all Message's Reactions](https://developer.unipile.com/v2.0/reference/getmessagereactionslist.md): Returns the list of reactions made to a message. Reaction counts are given with the Message object. This is useful to show a detailed list of all reactions and their author.
+  - Status
+    - [Get a User Presence](https://developer.unipile.com/v2.0/reference/getuserpresence.md): Returns whether the specified User is currently online, identified by the id returned by the provider. Only supported by Instagram, LinkedIn, Telegram and WhatsApp. A User whose provider reports no…
+    - [Set Presence](https://developer.unipile.com/v2.0/reference/setpresence.md): Sets the presence of the user.
+    - [Set Composing Status](https://developer.unipile.com/v2.0/reference/setcomposingstatus.md): Sets the composing status of the user in a chat.
+- Users
+  - Profiles
+    - [Get a User Profile](https://developer.unipile.com/v2.0/reference/getuserprofile.md): Retrieves the specified User profile. Use `me` as `user_id` to specify the owner of the connected account.
+    - [Update a User Profile](https://developer.unipile.com/v2.0/reference/updateuserprofile.md): Partially updates the specified User profile. Use `me` as `user_id` to update the account owner profile. Omitted properties remain unchanged; supplied values replace existing values; empty strings…
+    - [Report a Profile Visit](https://developer.unipile.com/v2.0/reference/visituserprofile.md): Report to the provider that you have visited a given user profile. This can be used to simulate engagement and activity.
+  - Relations / Follows
+    - [Unblock a User](https://developer.unipile.com/v2.0/reference/unblockuser.md): Unblocks a user previously blocked by the account owner. Unblocking a User that is not blocked has no effect. The `is_blocked` field of the User profile reflects the result.       LIMITATIONS: On…
+    - [Block a User](https://developer.unipile.com/v2.0/reference/blockuser.md): Blocks a user on behalf of the account owner. A blocked User can no longer contact the account owner. Blocking an already blocked User has no effect. The `is_blocked` field of the User profile…
+    - [List Relations of a User](https://developer.unipile.com/v2.0/reference/getuserrelations.md): Returns a list of bi-directional relations for the specified User. Use `me` as `user_id` to specify the owner of the connected account.
+    - [List all pending Relation / Follow requests](https://developer.unipile.com/v2.0/reference/getrelationrequestslist.md): Returns a list of pending relation / follow requests that have been sent or received by the owner of the account.
+    - [Send a Relation request](https://developer.unipile.com/v2.0/reference/createrelationrequest.md): Sends a bi-directional relation request to a user. Trying to send a relation request to an existing relation will fail. For uni-directional relations, use `Follow User` instead.
+    - [Cancel or Refuse a Relation / Follow request](https://developer.unipile.com/v2.0/reference/cancelrelationrequest.md): Cancels the relation / follow request if sent by the owner of the account to another user. Refuses the relation / follow request if received by the owner of the account from another user.
+    - [Accept a Relation request](https://developer.unipile.com/v2.0/reference/acceptrelationrequest.md): Accepts a received relation request from another user. Trying to accept a sent relation request will fail.
+    - [List Followers of a User](https://developer.unipile.com/v2.0/reference/listuserfollowers.md): Returns a list of followers of the specified User. Set `me` as `user_id` to specify the owner of the connected account.
+    - [List Following of a User](https://developer.unipile.com/v2.0/reference/listuserfollowing.md): Returns a list of Users followed by the specified User. Set `me` as `user_id` to specify the owner of the connected account. On LinkedIn, only the literal value `me` is supported for `user_id`; other…
+    - [Follow a User](https://developer.unipile.com/v2.0/reference/followuser.md): Follows a user. Trying to follow an already followed User will fail. For bi-directional relations, use `Send Relation Request` instead. If the User has a private profile, this will create a Follow…
+    - [Unfollow a User](https://developer.unipile.com/v2.0/reference/unfollowuser.md): Unfollows a user. Trying to unfollow a not followed User will fail.
+    - [Delete a Relation](https://developer.unipile.com/v2.0/reference/deleterelation.md): Deletes a bi-directional relation with another user. For uni-directional relations, use `Unfollow User` instead.
+  - Contacts
+    - [List contacts](https://developer.unipile.com/v2.0/reference/getcontactslist.md): Returns a list of contacts for the connected account. Served by the email provider for email accounts and by the messaging provider for messaging accounts (e.g. WhatsApp). On providers where a…
+  - [Get a User Picture](https://developer.unipile.com/v2.0/reference/getuserpicture.md): Downloads the profile picture of the specified User. Use `me` as `user_id` to specify the owner of the connected account. For the providers that publish no public url for it, the url of this endpoint…
+- Emails
+  - [List all Emails](https://developer.unipile.com/v2.0/reference/getemailslist.md): Returns a list of emails in the account mailbox. Emails are returned sorted by their `date`, with the most recent appearing first. Search mode applies when `q`, `from`, `to`, or `any_email` is set.…
+  - [List folder Emails](https://developer.unipile.com/v2.0/reference/getfolderemailslist.md): Returns a list of emails in the specific folder of the account mailbox. Emails are returned sorted by their `date`, with the most recent appearing first. Search mode applies when `q`, `from`, `to`,…
+  - [Get a Thread](https://developer.unipile.com/v2.0/reference/getthread.md): Returns a list of emails belonging to the specific thread. Emails are sorted by their `date`. On IMAP servers without native thread IDs, results are inferred from message headers and may be…
+  - [Get an Email](https://developer.unipile.com/v2.0/reference/getemail.md): Retrieve the specified Email.
+  - [Trash an Email](https://developer.unipile.com/v2.0/reference/trashemail.md): Moves the specified Email to the trash.
+  - [Get an Email Attachment](https://developer.unipile.com/v2.0/reference/getattachment1.md): Download the attachment file of an Email.
+  - [Modify an Email](https://developer.unipile.com/v2.0/reference/modifyemail.md): Modifies the folder(s) and/or provider-specific properties on the specified Email.
+  - [Unread an Email](https://developer.unipile.com/v2.0/reference/unreademail.md): Mark the specified Email as unread.
+  - [Read an Email](https://developer.unipile.com/v2.0/reference/reademail.md): Mark the specified Email as read.
+  - [Send an Email](https://developer.unipile.com/v2.0/reference/sendemail.md): Sends an Email to the recipients in the `to`, `cc`, and `bcc`.<br/><br/>Multipart supported, refer to <a href="https://developer.unipile.com/v2.0/reference/api-usage#sending-files">Sending Files</a>.
+  - [List all Drafts](https://developer.unipile.com/v2.0/reference/getdraftslist.md): Returns a list of the account drafts. Drafts are returned sorted by their creation date, with the most recent appearing first.
+  - [Create a Draft](https://developer.unipile.com/v2.0/reference/createdraft.md): Creates a new Draft in the draft folder of the provider. Use Send a Draft to send the Email later. Outlook supports native replies with reply_to_message_id. Provide the desired to and cc recipients…
+  - [Get a Draft](https://developer.unipile.com/v2.0/reference/getdraft.md): Retrieve the specified Draft.
+  - [Delete a Draft](https://developer.unipile.com/v2.0/reference/deletedraft.md): Permanently deletes the specified Draft.
+  - [Update a Draft](https://developer.unipile.com/v2.0/reference/updatedraft.md): Updates the specified Draft by setting the values of the parameters passed. Any parameters not provided will be left unchanged. Outlook native reply drafts, including drafts created in Outlook, keep…
+  - [Send a Draft](https://developer.unipile.com/v2.0/reference/senddraft.md): Sends the specified Draft to the recipients in the `to`, `cc`, and `bcc` fields of the draft. Outlook sends the existing native draft, preserving its reply conversation.
+  - [List all Folders](https://developer.unipile.com/v2.0/reference/getfolderslist.md): Returns a list of folders in the account mailbox.
+  - [Create a Folder](https://developer.unipile.com/v2.0/reference/createfolder.md): Creates a new Folder in the account mailbox.
+  - [Get a Folder](https://developer.unipile.com/v2.0/reference/getfolder.md): Retrieves the specified Folder
+  - [Delete a Folder](https://developer.unipile.com/v2.0/reference/deletefolder.md): Deletes the specified Folder
+  - [Update a Folder](https://developer.unipile.com/v2.0/reference/updatefolder.md): Updates the specified Folder by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
+  - [List email senders](https://developer.unipile.com/v2.0/reference/getemailsenders.md): Returns the email senders available for the connected account, so you can discover the valid values to pass as `from` when sending emails or creating drafts. The list includes the primary address as…
+- Calendar
+  - [List all Calendars](https://developer.unipile.com/v2.0/reference/getcalendarslist.md): Returns a list of calendars.
+  - [Create a Calendar](https://developer.unipile.com/v2.0/reference/createcalendar.md): Create a new calendar.
+  - [Get a Calendar](https://developer.unipile.com/v2.0/reference/getcalendar.md): Retrieves the specified Calendar.
+  - [Update a Calendar](https://developer.unipile.com/v2.0/reference/updatecalendar.md): Updates the specified calendar by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
+  - [Delete a Calendar](https://developer.unipile.com/v2.0/reference/deletecalendar.md): Delete the specified calendar.
+  - [List all calendar events](https://developer.unipile.com/v2.0/reference/getcalendareventlist.md): Returns a list of calendar events.         - For Outlook, the attendee list of an invitation the connected account received is the one the organizer sent, and their responses are not refreshed on it.…
+  - [Create a calendar event](https://developer.unipile.com/v2.0/reference/createcalendarevent.md): Create a brand new calendar event.
+  - [Get a calendar event](https://developer.unipile.com/v2.0/reference/getcalendarevent.md): Retrieves a calendar event object.         - For Outlook, the attendee list of an invitation the connected account received is the one the organizer sent, and their responses are not refreshed on it.…
+  - [Update a calendar event](https://developer.unipile.com/v2.0/reference/updatecalendarevent.md): Updates the specified calendar by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
+  - [Delete a Calendar event](https://developer.unipile.com/v2.0/reference/deletecalendarevent.md): Delete the specified calendar event.
+  - [Respond to a calendar event](https://developer.unipile.com/v2.0/reference/setcalendareventrsvp.md): Sets the response of the connected account to an event it is invited to. Only the response of the connected account is affected, the other attendees are left untouched.         - For Outlook,…
+  - [Cancel a calendar event](https://developer.unipile.com/v2.0/reference/cancelcalendarevent.md): Cancels the specified event and notifies its attendees. Only the organizer of the event can cancel it, use the delete event method to remove an event from the calendar of the connected account.…
+  - [Restore a cancelled calendar event](https://developer.unipile.com/v2.0/reference/restorecalendarevent.md): Restores an event previously cancelled by the connected account. Only the organizer of the event can restore it.         - Only available for Google Calendar, and only while Google still holds the…
+- Posts
+  - [List all User's Posts](https://developer.unipile.com/v2.0/reference/getpostslist.md): Returns a list of posts created or shared by a user. Use `me` as `user_id` to specify the owner of the connected account.       LIMITATIONS: On Facebook, the page size is set by Facebook: each page…
+  - [List all User Reactions](https://developer.unipile.com/v2.0/reference/getuserreactionslist.md): Returns the list of reactions made by a user to posts. Use `me` as `user_id` to specify the owner of the connected account.       LIMITATIONS: On Facebook, only the account itself (`me`) or one of…
+  - [Get a Post](https://developer.unipile.com/v2.0/reference/getpost.md): Retrieves the specified post.
+  - [Delete a Post](https://developer.unipile.com/v2.0/reference/deletepost.md): Deletes a post created by the owner of the account. Trying to delete a post created by another user will fail.
+  - [Create a Post](https://developer.unipile.com/v2.0/reference/createpost.md): Creates a new post.<br/><br/>Multipart supported, refer to <a href="https://developer.unipile.com/v2.0/reference/api-usage#sending-files">Sending Files</a>.
+  - [Create a Story](https://developer.unipile.com/v2.0/reference/createstory.md): Creates a new story from a single image or video attachment (if supported by the provider).<br/><br/>Multipart supported, refer to <a…
+  - [Update a Post](https://developer.unipile.com/v2.0/reference/updatepost.md): Updates an existing post.
+  - [List all Post's Reactions](https://developer.unipile.com/v2.0/reference/getpostreactionslist.md): Returns the list of reactions made to a post. Reaction counts are given with the Post object. This is useful to show a detailed list of all reactions and their author.       LIMITATIONS: On…
+  - [Add Reaction to a Post](https://developer.unipile.com/v2.0/reference/addpostreaction.md): Adds a reaction to a post.
+  - [Remove Reaction from a Post](https://developer.unipile.com/v2.0/reference/removepostreaction.md): Removes a reaction from a post.
+  - Comments
+    - [List all User Comments](https://developer.unipile.com/v2.0/reference/getusercommentslist.md): Returns the list of comments made by a user to posts. Use `me` as `user_id` to specify the owner of the connected account.       LIMITATIONS: On Facebook, only the account itself (`me`) or one of its…
+    - [List all Post's Comments](https://developer.unipile.com/v2.0/reference/getpostcommentslist.md): Returns a list of post comments. The comments are returned sorted by their creation date, with the most recent appearing first.       LIMITATIONS: On Facebook, the page size is set by Facebook: each…
+    - [Add Comment to a Post](https://developer.unipile.com/v2.0/reference/addpostcomment.md): Adds a comment to a post.       LIMITATIONS: On Facebook, a comment takes one image; an animated GIF file is published as a still image.<br/><br/>Multipart supported, refer to <a…
+    - [Update a Comment](https://developer.unipile.com/v2.0/reference/updatepostcomment.md): Updates an existing comment.
+    - [Delete Comment from a Post](https://developer.unipile.com/v2.0/reference/deletepostcomment.md): Deletes a comment of the account's owner from a post. Trying to delete a comment from another user will fail.
+    - [List all Comment's Replies](https://developer.unipile.com/v2.0/reference/getpostcommentreplieslist.md): Returns the list of replies to a comment. The replies are returned sorted by their creation date, with the most recent appearing first.       LIMITATIONS: On Facebook, the page size is set by…
+    - [Reply to a Comment](https://developer.unipile.com/v2.0/reference/replytocomment.md): Replies to a particular comment.       LIMITATIONS: On Facebook, a comment takes one image; an animated GIF file is published as a still image.<br/><br/>Multipart supported, refer to <a…
+    - [List all Comment's Reactions](https://developer.unipile.com/v2.0/reference/getpostcommentreactionslist.md): Returns the list of reactions made to a comment. Reaction counts are given with the Comment object. This is useful to show a detailed list of all reactions and their author.       LIMITATIONS: On…
+    - [Add Reaction to a Comment](https://developer.unipile.com/v2.0/reference/addpostcommentreaction.md): Adds a reaction to a post.
+    - [Remove Reaction from a Comment](https://developer.unipile.com/v2.0/reference/removepostcommentreaction.md): Removes a reaction of the account's owner from a comment. Trying to remove a reaction from another user will fail.
+
+## API Reference: Methods (specifics)
+- LinkedIn
+  - [Get Job Slots Credits](https://developer.unipile.com/v2.0/reference/getrecruiterjobslotscredits.md): Retrieves current contract Job slots credits.
+  - [Get InMail Credits](https://developer.unipile.com/v2.0/reference/getinmailcredits.md): Retrieves InMail credits by service or for all subscribed services.
+  - [List Available Contracts](https://developer.unipile.com/v2.0/reference/getavailablecontracts.md): Returns a list of Recruiter/Sales Navigator contracts associated with your account.
+  - [Select a Contract](https://developer.unipile.com/v2.0/reference/selectcontract.md): Activates a given Recruiter/Sales Navigator contract on your account.
+  - [Perform a Request to any LinkedIn API Endpoint](https://developer.unipile.com/v2.0/reference/proxyrequest.md): Allows advanced users to implement any LinkedIn feature that is not yet supported by our platform.
+  - [List Profile Views](https://developer.unipile.com/v2.0/reference/getprofileviews.md): Returns a list of users who recently viewed your profile, along with a range of analytics data.       Non-premium users will only have access to a limited amount of data, and search filters will be…
+  - Classic Member
+    - [Endorse a Member's Skill](https://developer.unipile.com/v2.0/reference/endorseclassicmemberskill.md): Validates a given skill for one of your relations.
+  - Classic Company
+    - [Get Company Follow Request Credits](https://developer.unipile.com/v2.0/reference/getcompanyfollowinvitationcredits.md): Retrieves the remaining credits for inviting members to follow a LinkedIn company page.
+    - [Invite Members to Follow a Company](https://developer.unipile.com/v2.0/reference/sendcompanyfollowinvitation.md): Sends a request to one or more users to follow a LinkedIn company page administered by the account.
+    - [List Managed Company Pages](https://developer.unipile.com/v2.0/reference/getmanagedcompanypages.md): Returns a list of company pages for which the account user is an administrator.
+    - [Get a Company Profile](https://developer.unipile.com/v2.0/reference/getclassiccompanyprofile.md): Retrieves the specified company profile.
+    - [Verify Company Member Identity](https://developer.unipile.com/v2.0/reference/verifyclassiccompanymemberidentity.md): Verifies member identity by submitting an email address.
+    - [Submit Otp Verification Code](https://developer.unipile.com/v2.0/reference/submitclassiccompanyotpcode.md): Completes the process of member identity verification.
+  - Classic Search
+    - [List Search Parameters](https://developer.unipile.com/v2.0/reference/getclassicsearchparameters.md): Returns a list of parameters to be used in the search route.
+    - [Perform People Search](https://developer.unipile.com/v2.0/reference/performclassicpeoplesearch.md): Returns a list of people from search results.
+    - [Perform Companies Search](https://developer.unipile.com/v2.0/reference/performclassiccompaniessearch.md): Returns a list of companies from search results.
+    - [Perform Jobs Search](https://developer.unipile.com/v2.0/reference/performclassicjobssearch.md): Returns a list of job postings from search results.
+    - [Perform Posts Search](https://developer.unipile.com/v2.0/reference/performclassicpostssearch.md): Returns a list of posts from search results.
+    - [Perform Classic Search from URL](https://developer.unipile.com/v2.0/reference/performclassicsearchfromurl.md): Returns a list of results from a LinkedIn Classic search URL.
+  - Classic Job Posting
+    - [List User Job Postings](https://developer.unipile.com/v2.0/reference/listclassicuserjobpostings.md): Returns a list of job postings created by the current user.
+    - [Get a Job Posting](https://developer.unipile.com/v2.0/reference/getclassicjobposting.md): Retrieves a job posting by its ID.
+    - [Get the Budget for a Job Posting](https://developer.unipile.com/v2.0/reference/getclassicjobpostingbudget.md): Returns available budget ranges, recommended budgets, and estimated impact.
+    - [Create a Job Posting Draft](https://developer.unipile.com/v2.0/reference/createclassicjobpostingdraft.md): Creates a new job posting as draft.       Use <a href="https://developer.unipile.com/v2.0/reference/publishclassicjobposting">Publish a Job Posting</a> to publish the job once you are ready.
+    - [Edit an existing Job Posting](https://developer.unipile.com/v2.0/reference/editclassicjobposting.md): Edits a job posting created by the current user.
+    - [Publish a Job Posting](https://developer.unipile.com/v2.0/reference/publishclassicjobposting.md): Publishes a job posting with specific budget options.
+    - [Close a Job Posting](https://developer.unipile.com/v2.0/reference/closeclassicjobposting.md): Closes a job posting so applications cannot be submitted anymore.
+    - [Get an Applicant](https://developer.unipile.com/v2.0/reference/getclassicapplicantbyid.md): Retrieves an applicant by ID.
+    - [Get an Applicant's Resume](https://developer.unipile.com/v2.0/reference/getclassicapplicantresume.md): Downloads the resume of a given applicant.
+    - [List Job Posting Applicants](https://developer.unipile.com/v2.0/reference/getclassicapplicants.md): Returns a list of the applicants to a job posting.
+  - Recruiter Projects
+    - [List Projects](https://developer.unipile.com/v2.0/reference/getrecruiterhiringprojectlist.md): Returns a list of hiring projects created in the current contract scope.
+    - [Get a Project](https://developer.unipile.com/v2.0/reference/getrecruiterhiringproject.md): Retrieves the specified hiring project.
+    - [List Pipeline Candidates](https://developer.unipile.com/v2.0/reference/getrecruiterpipelinecandidates.md): Returns a list of candidates from the pipeline of a project.
+    - [Create a New Project](https://developer.unipile.com/v2.0/reference/createrecruiterhiringproject.md): Creates a new project in the current contract.
+    - [Edit a Project](https://developer.unipile.com/v2.0/reference/editrecruiterhiringproject.md): Edits the specified hiring project.
+  - Recruiter Company
+    - [Verify Company Member Identity](https://developer.unipile.com/v2.0/reference/verifyrecruitercompanymemberidentity.md): Verifies member identity by submitting an email address.
+    - [Submit Otp Verification Code](https://developer.unipile.com/v2.0/reference/submitrecruiterotpcode.md): Completes the process of member identity verification.
+  - Recruiter Search
+    - [List Search Parameters](https://developer.unipile.com/v2.0/reference/getrecruitersearchparameters.md): Returns a list of parameters to be used in Recruiter search endpoints.
+    - [Perform People Search](https://developer.unipile.com/v2.0/reference/performrecruiterpeoplesearch.md): Returns a list of people from search results.
+    - [Perform People Search From Talent Pool](https://developer.unipile.com/v2.0/reference/performrecruiterpeoplesearchfromtalentpool.md): Returns a list of people from search results.
+    - [Perform Recruiter Search from URL](https://developer.unipile.com/v2.0/reference/performrecruitersearchfromurl.md): Returns a list of results from a LinkedIn Recruiter search URL.
+  - Recruiter Job Posting
+    - [List Job Postings](https://developer.unipile.com/v2.0/reference/getrecruiterjobpostinglist.md): Returns a list of job postings created by the current user or related job posters.
+    - [Get a Job Posting](https://developer.unipile.com/v2.0/reference/getrecruiterjobpostingbyid.md): Retrieves a job posting by its ID.
+    - [Get a Job Posting by Project](https://developer.unipile.com/v2.0/reference/getrecruiterjobpostingbyprojectid.md): Retrieves a job posting by project.
+    - [Get the Budget for a Job Posting](https://developer.unipile.com/v2.0/reference/getrecruiterjobpostingbudget.md): Returns available budget ranges, recommended budgets, and estimated impact.
+    - [Create a Job Posting Draft in a New Project](https://developer.unipile.com/v2.0/reference/createrecruiterjobpostingdraftinnewproject.md): Creates a new job posting as draft in a new project.       Use <a href="https://developer.unipile.com/v2.0/reference/publishrecruiterjobposting">Publish a Job Posting</a> to publish the job once you…
+    - [Create a Job Posting Draft in an Existing Project](https://developer.unipile.com/v2.0/reference/createrecruiterjobpostingdraftinexistingproject.md): Creates a new job posting as draft in a new project.       Use <a href="https://developer.unipile.com/v2.0/reference/publishrecruiterjobposting">Publish a Job Posting</a> to publish the job once you…
+    - [Edit an Existing Job Posting](https://developer.unipile.com/v2.0/reference/editrecruiterjobposting.md): Edits an existing job posting from a project.
+    - [Publish a Job Posting](https://developer.unipile.com/v2.0/reference/publishrecruiterjobposting.md): Publishes a job posting with specific budget options.
+    - [Close a Job Posting](https://developer.unipile.com/v2.0/reference/closerecruiterjobposting.md): Closes a job posting so applications cannot be submitted anymore.
+    - [List Job Posting Applicants](https://developer.unipile.com/v2.0/reference/getrecruitertalentpoolapplicants.md): Returns a list of applicants from the talent pool of a project.
+    - [Get an Applicant](https://developer.unipile.com/v2.0/reference/getrecruiterapplicantbyid.md): Retrieves an applicant by ID.
+    - [Get an Applicant's Resume](https://developer.unipile.com/v2.0/reference/getrecruiterapplicantresume.md): Downloads the resume of a given applicant.
+    - [Save a Candidate](https://developer.unipile.com/v2.0/reference/saverecruitercandidatetopipeline.md): Saves a candidate to the pipeline of a project
+  - Sales Navigator Lists
+    - [Get Accounts Lists](https://developer.unipile.com/v2.0/reference/getsalesaccountlists.md): Returns your accounts lists.
+    - [Get Leads Lists](https://developer.unipile.com/v2.0/reference/getsalesleadlists.md): Returns your leads lists.
+    - [Browse an Account List](https://developer.unipile.com/v2.0/reference/browsesalesaccountlist.md): Returns the accounts that have been saved in the given list.
+    - [Browse a Lead List](https://developer.unipile.com/v2.0/reference/browsesalesleadlist.md): Returns the leads that have been saved in the given list.
+    - [Save an Account To a List](https://developer.unipile.com/v2.0/reference/savesalesaccounttolist.md): Add an account to an existing list
+    - [Save a Lead To a List](https://developer.unipile.com/v2.0/reference/savesalesleadtolist.md): Add a lead to an existing list
+  - Sales Navigator Search
+    - [List Search Parameters](https://developer.unipile.com/v2.0/reference/getsalessearchparameters.md): Returns a list of parameters to be used in Sales navigator search endpoints.
+    - [Perform People Search](https://developer.unipile.com/v2.0/reference/performsalespeoplesearch.md): Returns a list of people from search results.
+    - [Perform Companies Search](https://developer.unipile.com/v2.0/reference/performsalescompaniessearch.md): Returns a list of companies from search results.
+    - [Perform Search from URL](https://developer.unipile.com/v2.0/reference/performsalessearchfromurl.md): Returns a list of results from a LinkedIn Sales navigator search URL.
+  - Recruiter Sessions
+    - [Sign Out of Other Recruiter Sessions](https://developer.unipile.com/v2.0/reference/signoutotherrecruitersessions.md): Signs out the other sessions for the selected LinkedIn Recruiter seat while preserving the current session. This can disconnect other browsers using the same seat. Use this endpoint to solve any…
+    - [Sign Out of the Current Recruiter Session](https://developer.unipile.com/v2.0/reference/signoutrecruitersession.md): Signs out the current session for the selected LinkedIn Recruiter contract.
+- Instagram
+  - [Search locations](https://developer.unipile.com/v2.0/reference/searchlocations.md): Return a list of Instagram locations. Use `latitude` and `longitude` to orient search query results by influencing their relevance ranking. When a search query is performed, locations that are…
+- Outlook
+  - [List email categories](https://developer.unipile.com/v2.0/reference/getemailcategories.md): Returns the categories defined in the account mailbox, so you can discover the valid values to assign to an email through the `categories` field. Categories are a mailbox-wide list, independent from…
+  - [Create an email category](https://developer.unipile.com/v2.0/reference/createemailcategory.md): Creates a new category in the account mailbox, which can then be assigned to emails through the `categories` field. A category name is unique within a mailbox: creating one with a name already in use…
+  - [Delete an email category](https://developer.unipile.com/v2.0/reference/deleteemailcategory.md): Deletes the specific category from the account mailbox. Emails already carrying it keep the category name, which is no longer part of the mailbox list.
+  - [List category Emails](https://developer.unipile.com/v2.0/reference/getcategoryemailslist.md): Returns a list of emails carrying the specific category, across all the folders of the account mailbox. Emails are returned sorted by their `date`, with the most recent appearing first. Search mode…
+
+## API Reference: PLATFORM
+- Accounts
+  - [Get an Account](https://developer.unipile.com/v2.0/reference/getaccount.md): Retrieve an Account. After successful Hosted Auth authentication with initial sync waiting enabled, the consumed session can retrieve only its linked account until its polling deadline.
+  - [Remove an Account](https://developer.unipile.com/v2.0/reference/removeaccount.md): Remove an Account from Unipile by its ID. This action is irreversible and will remove all data associated with the Account.
+  - [Update an Account](https://developer.unipile.com/v2.0/reference/updateaccount.md): Update an Account by ID.
+  - [List all Accounts](https://developer.unipile.com/v2.0/reference/listaccounts.md): Returns the Accounts accessible to the API Key in the current Application. Use `account_scope_id` with a Scope ID to return Accounts assigned to that Scope, or `none` to return Accounts without a…
+  - [Synchronize an Account](https://developer.unipile.com/v2.0/reference/syncaccount.md): Request a full history synchronization for an Account, including after an earlier synchronization completed. Currently supported for WhatsApp accounts. The response confirms that the request was…
+- Scopes
+  - [Create a Scope](https://developer.unipile.com/v2.0/reference/createscope.md): Creates a Scope in the authenticated Application. A Scope is an isolation boundary used to restrict Account API Keys to the Accounts assigned to it.
+  - [List Scopes](https://developer.unipile.com/v2.0/reference/listscopes.md): Returns the Scopes created in the authenticated Application, including their status and the number of Accounts and API Keys assigned to each Scope.
+  - [Get a Scope](https://developer.unipile.com/v2.0/reference/getscope.md): Returns a Scope from the authenticated Application, including its status and the number of Accounts and API Keys assigned to it.
+  - [Update a Scope](https://developer.unipile.com/v2.0/reference/updatescope.md): Updates the name, unique reference, or status of a Scope. Disabling a Scope blocks its Account API Keys and authentication flows until it is enabled again.
+  - [Delete a Scope](https://developer.unipile.com/v2.0/reference/deletescope.md): Deletes a Scope from the authenticated Application. The Scope must not contain any Accounts or API Keys, including expired API Keys.
+- API Keys
+  - [Create an API Key](https://developer.unipile.com/v2.0/reference/createapikey.md): Creates an API key that can access every account or only accounts assigned to one scope. Service API keys cannot be created through this endpoint.
+  - [List API Keys](https://developer.unipile.com/v2.0/reference/listapikeys.md): Lists account-wide and scoped API keys. Service API keys are never exposed by this endpoint.
+  - [Delete an API Key](https://developer.unipile.com/v2.0/reference/deleteapikey.md): Deletes an account-wide or scoped API key. Service API keys cannot be deleted through this endpoint.
+- Webhooks
+  - [List all Webhook Conversations](https://developer.unipile.com/v2.0/reference/listwebhookconversations.md): Returns a list of all Webhook Conversations associated with the current Application. The conversations are returned sorted by their creation date, with the most recent appearing first.
+  - [Create a Webhook Endpoint](https://developer.unipile.com/v2.0/reference/createwebhookendpoint.md): Creates a new webhook endpoint.
+  - [List all Webhook Endpoints](https://developer.unipile.com/v2.0/reference/listwebhookendpoints.md): Returns a list of all Webhook Endpoints associated with the current Application.
+  - [Update a Webhook Endpoint](https://developer.unipile.com/v2.0/reference/updatewebhookendpoint.md): Updates a webhook endpoint by ID.
+  - [Delete a Webhook Endpoint](https://developer.unipile.com/v2.0/reference/deletewebhookendpoint.md): Deletes a webhook endpoint by ID.
+  - [Get a Webhook Endpoint](https://developer.unipile.com/v2.0/reference/getwebhookendpoint.md): Retrieves a webhook endpoint by ID.
+  - [Replay a Webhook Event](https://developer.unipile.com/v2.0/reference/replaywebhookevent.md): Queues a new delivery of a stored event to all currently enabled endpoints listening to this event and matching its account, even after successful delivery. Uses the original event ID and payload,…
+
+## Changelog
+- [v2.20261104.1 - Oulook categories, Blocked users, Message mentions](https://developer.unipile.com/v2.0/changelog/v2-oulook-categories-blocked-users-message-mentions.md)
+- [v1 - Last months update](https://developer.unipile.com/v2.0/changelog/last-months-update-v1-1.md)
+- [v1 - Last months update](https://developer.unipile.com/v2.0/changelog/last-months-update-v1.md)
+- [v1 - Last months update](https://developer.unipile.com/v2.0/changelog/last-months-update-3.md)
+- [Last months update](https://developer.unipile.com/v2.0/changelog/last-months-update-2.md)
+- [Last months update](https://developer.unipile.com/v2.0/changelog/last-months-update-1.md)
+- [Last months update](https://developer.unipile.com/v2.0/changelog/last-months-updates.md)
+- [Last months update](https://developer.unipile.com/v2.0/changelog/last-months-update.md)
+- [Last months update](https://developer.unipile.com/v2.0/changelog/last-weeks-update.md)

@@ -99,7 +99,7 @@ Seeing what someone engages with (each item carries the `parent_post`):
 Filters take parameter IDS — resolve names first:
 
     linkedin search params --type LOCATION --keywords "san francisco"
-    linkedin search run people --keywords "fintech founder" --location <loc-id> --limit 10
+    linkedin search run people --keywords "fintech founder" --location <loc-id>
     linkedin search run companies --keywords "devtools"
     linkedin search run posts --keywords "agents" --posted-within PAST_WEEK
 
@@ -107,7 +107,7 @@ Or skip the filter-id dance entirely by pasting a LinkedIn search URL from the b
 
     linkedin search run --url "https://www.linkedin.com/search/results/people/?keywords=..."
 
-URL mode takes no category or filters (they're encoded in the URL), allows --limit up to 100, and can return people, companies, jobs, or posts depending on the URL. Category mode paginates by --offset at max 50/page. Sales Navigator and Recruiter search are not wrapped; use `linkedin raw` if you must.
+URL mode takes no category or filters (they're encoded in the URL), allows --limit up to 100, and can return people, companies, jobs, or posts depending on the URL. Category mode paginates with --cursor from next_cursor. Omit --limit for people/companies; posts default to 3 and accept up to 49. URL mode accepts either --cursor or --offset, never both. Sales Navigator and Recruiter search are not wrapped; use `linkedin raw` if you must.
 
 ## Escape hatch
 

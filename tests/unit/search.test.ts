@@ -21,9 +21,9 @@ describe("search ops", () => {
   it("people search builds body with filters and advanced keywords", async () => {
     const { ctx, f } = ctxCapturing([{ body: { data: [], total_count: 0 } }]);
     await searchLinkedIn.run(ctx, {
-      category: "people", keywords: "fintech", network_distance: [2], location: ["loc1"], title: "founder", limit: 10,
+      category: "people", keywords: "fintech", network_distance: [2], location: ["loc1"], title: "founder",
     });
-    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/linkedin/search/people?limit=10");
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/linkedin/search/people");
     expect(call(f).body).toEqual({
       keywords: "fintech", network_distance: [2], location: ["loc1"], advanced_keywords: { title: "founder" },
     });
@@ -59,12 +59,30 @@ describe("search ops", () => {
     }
   });
 
-  it("carries offset/next_offset through search results", async () => {
-    const { ctx, f } = ctxCapturing([{ body: { data: [{ id: "a" }, { id: "b" }], total_count: 5 } }]);
-    const out = await searchLinkedIn.run(ctx, { category: "people", keywords: "x", limit: 2, offset: 2 });
-    expect(call(f).url).toContain("limit=2");
-    expect(call(f).url).toContain("offset=2");
-    expect(out).toMatchObject({ offset: 2, next_offset: 4 });
+  it("forwards category cursors without inventing next offsets", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [{ id: "a" }], next_cursor: "next" } }]);
+    const out = await searchLinkedIn.run(ctx, { category: "people", cursor: "previous" });
+    expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/linkedin/search/people?cursor=previous");
+    expect(out).toEqual({ items: [{ id: "a" }], next_cursor: "next" });
+  });
+
+  it("rejects unsupported pagination before making requests", async () => {
+    for (const input of [
+      { category: "people", offset: 0 }, { category: "companies", limit: 10 },
+      { category: "posts", limit: 50 }, { category: "posts", cursor: "x", offset: 1 },
+    ]) {
+      const { ctx, f } = ctxCapturing([{ body: { data: [] } }]);
+      await expect(searchLinkedIn.run(ctx, input)).rejects.toThrow(UsageError);
+      expect(f).not.toHaveBeenCalled();
+    }
+  });
+
+  it("accepts the documented posts limit and preserves terminal cursor semantics", async () => {
+    const { ctx, f } = ctxCapturing([{ body: { data: [], next_cursor: null } }]);
+    const out = await searchLinkedIn.run(ctx, { category: "posts", limit: 49 });
+    expect(call(f).url).toContain("limit=49");
+    expect(out.next_offset).toBeUndefined();
+    expect(out.next_cursor).toBeUndefined();
   });
 
   it("requires category when url is absent, with zero network calls", async () => {
@@ -108,7 +126,7 @@ describe("search ops", () => {
 
   it("omits next_offset on the terminal page and forwards offsets in params search", async () => {
     const a = ctxCapturing([{ body: { data: [{ id: "a" }], total_count: 3 } }]);
-    const terminal = await searchLinkedIn.run(a.ctx, { category: "people", limit: 2, offset: 2 });
+    const terminal = await searchLinkedIn.run(a.ctx, { category: "people" });
     expect(terminal.next_offset).toBeUndefined();
 
     const b = ctxCapturing([{ body: { data: [{ object: "SearchParameter", id: "l1", name: "SF" }] } }]);

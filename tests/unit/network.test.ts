@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { UnipileClient } from "../../src/core/client.js";
 import {
   followUser, getCompany, getProfile, listConnections, listInvitations, removeConnection, respondInvitation, sendInvitation,
@@ -20,6 +21,14 @@ describe("network ops", () => {
     const out = await getProfile.run(ctx, { user: "me", sections: ["linkedin_experience"] });
     expect(call(f).url).toBe("https://api.unipile.com/v2/acc_1/users/me?with_sections=linkedin_experience");
     expect(out).toEqual({ item: { object: "UserProfile", id: "u1" } });
+  });
+
+  it("accepts and forwards preview sections documented in v2", async () => {
+    const input = z.object(getProfile.inputShape).parse({ user: "me", sections: ["linkedin_experience_preview", "linkedin_recruiting_activity_preview"] });
+    const { ctx, f } = ctxCapturing([{ object: "UserProfile" }]);
+    await getProfile.run(ctx, input);
+    const query = new URL(call(f).url).searchParams;
+    expect(query.getAll("with_sections")).toEqual(input.sections);
   });
 
   it("getProfile forwards the variant query param", async () => {

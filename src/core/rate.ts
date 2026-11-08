@@ -14,11 +14,13 @@ function isExpired(w: RateLimitSnapshot, now: number): boolean {
 }
 
 /**
- * The "header brake": report the TIGHTEST rate window Unipile has told us about, so agents slow
+ * The "header brake": report the tightest OBSERVED rate window, so agents slow
  * down before hitting a 429. Multi-call operations touch several endpoints with independent
  * windows; reporting the last one seen would hide a nearly-exhausted window behind a healthy one.
  * "Tightest" is measured by fraction remaining, since windows have different sizes.
  *
+ * Headers expose only one checked window per response, without a rule identifier.
+ * This cannot reveal every applicable window or guarantee a later request is allowed.
  * The window is a ceiling, NEVER a target.
  */
 export function rateInfo(client: UnipileClient, now: number = Date.now()): Record<string, unknown> | undefined {
